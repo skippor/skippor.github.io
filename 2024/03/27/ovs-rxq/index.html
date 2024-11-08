@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>OVS收包队列分配 | Skippor&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="一、流的队列分配：rx-steering">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OVS收包队列分配">
+<meta property="og:url" content="https://skippor.github.io/2024/03/27/ovs-rxq/index.html">
+<meta property="og:site_name" content="Skippor&#39;s Blog">
+<meta property="og:description" content="一、流的队列分配：rx-steering">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-03-27T21:40:03.000Z">
+<meta property="article:modified_time" content="2024-11-08T02:29:40.890Z">
+<meta property="article:author" content="Skippor">
+<meta property="article:tag" content="dpdk">
+<meta property="article:tag" content="ovs">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Skippor's Blog" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Skippor&#39;s Blog</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://skippor.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-ovs-rxq" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2024/03/27/ovs-rxq/" class="article-date">
+  <time class="dt-published" datetime="2024-03-27T21:40:03.000Z" itemprop="datePublished">2024-03-27</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      OVS收包队列分配
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="一、流的队列分配：rx-steering"><a href="#一、流的队列分配：rx-steering" class="headerlink" title="一、流的队列分配：rx-steering"></a>一、流的队列分配：rx-steering</h2><p>可以为特有的流量分配专门的队列，避免核心数据包丢包引起网络故障，比如LACP，可以单独使用一个队列，类似的。其他协议也可以做类似处理。</p>
+<p>以ovs实现为例：假设有8个队列[0,1,2,3,4,5,6,7]，那么一般以最后一个队列作为专用队列让LACP协议独享，其他数据包走0-6号队列，</p>
+<p>(当然从实现而言，多个队列作为专用队列也不是不可以)，具体操作为：</p>
+<p>对于其他流量而言： 对rss分发表重新设置，屏蔽7号队列，只分配到0-6号队列，因此其他流量不会分到7号队列。</p>
+<p>对于LACP流量而言：通过dpdk的rte_flow_*创建一条flow，协议指定为LACP，动作指定为 分配到队列7即可</p>
+<p>如此一来，即使业务流量高到队列丢包的情况下，LACP由于单独一条队列也不会丢包。</p>
+<p>因此同样的方法可以适用于其他特殊流量，比如VRRP等，只需多加一条规则即可。</p>
+<p>这个从OVS来看，只适用于物理网卡，且和硬件卸载(主要是流量卸载到硬件处理)功能有冲突。如果启用了硬件卸载，则该功能失效。</p>
+<h2 id="二、队列的CORE分配：pmd-rxq-assign"><a href="#二、队列的CORE分配：pmd-rxq-assign" class="headerlink" title="二、队列的CORE分配：pmd-rxq-assign"></a>二、队列的CORE分配：pmd-rxq-assign</h2><p>这个主要是通过一定的策略将收包队列分配给不同的pmd线程(core)进行处理来均衡各个CPU的负载。</p>
+<p>在ovs中，主要有三种算法策略来分配队列：cycles(默认)&#x2F;group&#x2F;roundrobin，分配依据是队列处理周期(measured processing cycles)。</p>
+<p>当然，用户还能手动指定队列的绑定关系，pmd线程和队列绑定之后默认就是隔离的(isolated)，隔离状态下就不能调度了，</p>
+<p>不过在group调度模式下可以强制指定为非隔离的，上面的三种策略都是针对非隔离的队列和pmd线程进行调度处理的。</p>
+<p>这个在跨numa情况下调度，性能可能会下降。</p>
+<h3 id="1-cycles计算："><a href="#1-cycles计算：" class="headerlink" title="1. cycles计算："></a>1. cycles计算：</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">IDLE：一轮循环，没收发数据包，cycles算做IDLE</span><br><span class="line"></span><br><span class="line">BUSY：一轮循环，有收发数据包，cycles算做BUSY，启用自动负载均衡后，是否自动分配以这个指标所占百分比为依据。</span><br><span class="line"></span><br><span class="line">SLEEP：一轮循环，其中sleep的cycles，单独算做SLEEP</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-收包统计："><a href="#2-收包统计：" class="headerlink" title="2. 收包统计："></a>2. 收包统计：</h3><p>本轮收包(记录1次)：只统计收包总时间，默认5s统计一次</p>
+<p>直方图统计(记录12次)：统计最近12次收包总时间，调度时排序会用这个作比较</p>
+<h3 id="3-调度过程："><a href="#3-调度过程：" class="headerlink" title="3.调度过程："></a>3.调度过程：</h3><p>收集非隔离队列：先将非隔离的队列按照统计到的收包处理周期从大到小排列(roundrobin算法不用排)(手动指定隔离的但是没有CPU处理的也算是非隔离的队列)。<br>当前非隔离线程：先看port对应的numa上没有非隔离线程，没有的话就找其他有非隔离线程的numa。<br>将队列分配给对应线程：调度算法为：最新版本默认是cycles算法，2.9以前默认是roundrobin算法。</p>
+<h4 id="cycles："><a href="#cycles：" class="headerlink" title="cycles："></a>cycles：</h4><p>依次将队列分配给对应的线程，并且一轮分配完，按照逆序分配，即 1 → 2 → 3 → 3 → 2 → 1，</p>
+<p>假设当前收集完有5个队列(0,1,3,4,5)，3个线程(3,7,8)：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Queue #0: 30%</span><br><span class="line"></span><br><span class="line">Queue #1: 80%</span><br><span class="line"></span><br><span class="line">Queue #3: 60%</span><br><span class="line"></span><br><span class="line">Queue #4: 70%</span><br><span class="line"></span><br><span class="line">Queue #5: 10%</span><br></pre></td></tr></table></figure>
+<p>最终结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Core 3: Q1 (80%) |</span><br><span class="line">Core 7: Q4 (70%) | Q5 (10%)</span><br><span class="line">Core 8: Q3 (60%) | Q0 (30%)</span><br></pre></td></tr></table></figure>
+
+<h4 id="group："><a href="#group：" class="headerlink" title="group："></a>group：</h4><p>直接找负载最小的pmd分配，</p>
+<p>假设当前收集完有5个队列(0,1,3,4,5)，3个线程(3,7,8)：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Queue #0: 10%</span><br><span class="line"></span><br><span class="line">Queue #1: 80%</span><br><span class="line"></span><br><span class="line">Queue #3: 50%</span><br><span class="line"></span><br><span class="line">Queue #4: 70%</span><br><span class="line"></span><br><span class="line">Queue #5: 10%</span><br></pre></td></tr></table></figure>
+<p>最终结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Core 3: Q1 (80%) |</span><br><span class="line">Core 7: Q4 (70%) |</span><br><span class="line">Core 8: Q3 (50%) | Q0 (10%) | Q5 (10%)</span><br></pre></td></tr></table></figure>
+
+<h4 id="roundrobin："><a href="#roundrobin：" class="headerlink" title="roundrobin："></a>roundrobin：</h4><p>和cycles策略类似，只不过每一轮都是从头开始，即  1 → 2 → 3 → 1 → 2 → 3，<br>假设当前收集完有5个队列(0,1,3,4,5)，3个线程(3,7,8)：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Port #0 Queue #0 (P0Q0)</span><br><span class="line"></span><br><span class="line">Port #0 Queue #1 (P0Q1)</span><br><span class="line"></span><br><span class="line">Port #1 Queue #0 (P1Q0)</span><br><span class="line"></span><br><span class="line">Port #1 Queue #1 (P1Q1)</span><br><span class="line"></span><br><span class="line">Port #1 Queue #2 (P1Q2)</span><br></pre></td></tr></table></figure>
+<p>最终结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Core 3: P0Q0 | P1Q1</span><br><span class="line">Core 7: P0Q1 | P1Q2</span><br><span class="line">Core 8: P1Q0 |</span><br></pre></td></tr></table></figure>
+
+<h2 id="三、NETDEV-WATCHDOG"><a href="#三、NETDEV-WATCHDOG" class="headerlink" title="三、NETDEV WATCHDOG"></a>三、NETDEV WATCHDOG</h2><p>网卡队列满(剩余空间小于预留值)的情况下，网卡会停止发包，当watchdog发现网卡处于up状态并且发送队列处于停止时间大于5秒时将触发看门狗机制，</p>
+<p>dev_watchdog先找到停止的队列，然后调用igb_tx_timeout整个网卡队列做超时处理，igb_tx_timeout中对网卡做了DOWN、UP的操作。</p>
+<p><a target="_blank" rel="noopener" href="https://ld246.com/article/1637818896624">https://ld246.com/article/1637818896624</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://skippor.github.io/2024/03/27/ovs-rxq/" data-id="cm384jtdy000vsb7867frhgqq" data-title="OVS收包队列分配" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/dpdk/" rel="tag">dpdk</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ovs/" rel="tag">ovs</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2023/09/12/linux-qemu/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">Linux虚拟化之qemu的编译及使用</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/concurrency/" rel="tag">concurrency</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dpdk/" rel="tag">dpdk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gm/" rel="tag">gm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/" rel="tag">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/" rel="tag">https</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ikev1/" rel="tag">ikev1</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ikev2/" rel="tag">ikev2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ipsec/" rel="tag">ipsec</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k3s/" rel="tag">k3s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kernel/" rel="tag">kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/" rel="tag">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/" rel="tag">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/" rel="tag">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ovs/" rel="tag">ovs</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/performance/" rel="tag">performance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/qemu/" rel="tag">qemu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rust/" rel="tag">rust</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/" rel="tag">ssl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/study/" rel="tag">study</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/" rel="tag">work</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/concurrency/" style="font-size: 10px;">concurrency</a> <a href="/tags/dpdk/" style="font-size: 11.67px;">dpdk</a> <a href="/tags/gm/" style="font-size: 11.67px;">gm</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/ikev1/" style="font-size: 13.33px;">ikev1</a> <a href="/tags/ikev2/" style="font-size: 10px;">ikev2</a> <a href="/tags/ipsec/" style="font-size: 15px;">ipsec</a> <a href="/tags/k3s/" style="font-size: 11.67px;">k3s</a> <a href="/tags/kernel/" style="font-size: 16.67px;">kernel</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/ovs/" style="font-size: 10px;">ovs</a> <a href="/tags/performance/" style="font-size: 10px;">performance</a> <a href="/tags/qemu/" style="font-size: 10px;">qemu</a> <a href="/tags/rust/" style="font-size: 10px;">rust</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/study/" style="font-size: 11.67px;">study</a> <a href="/tags/work/" style="font-size: 18.33px;">work</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/03/">三月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/09/">九月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/06/">六月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/04/">四月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/03/">三月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/02/">二月 2023</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2024/03/27/ovs-rxq/">OVS收包队列分配</a>
+          </li>
+        
+          <li>
+            <a href="/2023/09/12/linux-qemu/">Linux虚拟化之qemu的编译及使用</a>
+          </li>
+        
+          <li>
+            <a href="/2023/06/05/work-playsound/">Linux命令行操作蓝牙播放步骤</a>
+          </li>
+        
+          <li>
+            <a href="/2023/04/29/work-github/">github常用的api接口</a>
+          </li>
+        
+          <li>
+            <a href="/2023/04/21/study-mysql/">MySQL环境安装及配置</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2024 Skippor<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.4.1.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
