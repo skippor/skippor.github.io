@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>vscode远程开发环境搭建 | Skippor&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="vscode远程开发环境搭建">
+<meta property="og:type" content="article">
+<meta property="og:title" content="vscode远程开发环境搭建">
+<meta property="og:url" content="https://skippor.github.io/2024/12/05/work-vscode/index.html">
+<meta property="og:site_name" content="Skippor&#39;s Blog">
+<meta property="og:description" content="vscode远程开发环境搭建">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-12-05T16:23:06.000Z">
+<meta property="article:modified_time" content="2024-12-05T07:16:43.257Z">
+<meta property="article:author" content="Skippor">
+<meta property="article:tag" content="work">
+<meta property="article:tag" content="windows">
+<meta property="article:tag" content="vscode">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Skippor's Blog" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Skippor&#39;s Blog</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://skippor.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-work-vscode" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2024/12/05/work-vscode/" class="article-date">
+  <time class="dt-published" datetime="2024-12-05T16:23:06.000Z" itemprop="datePublished">2024-12-05</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      vscode远程开发环境搭建
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="vscode远程开发环境搭建"><a href="#vscode远程开发环境搭建" class="headerlink" title="vscode远程开发环境搭建"></a>vscode远程开发环境搭建</h1><h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><ol>
+<li>下载安装vscode： <code>https://code.visualstudio.com/</code></li>
+<li>安装各种插件： <code>https://marketplace.visualstudio.com/</code></li>
+<li>配置服务器上vscode-server</li>
+</ol>
+<h2 id="离线安装升级vscode-server"><a href="#离线安装升级vscode-server" class="headerlink" title="离线安装升级vscode-server"></a>离线安装升级vscode-server</h2><ul>
+<li>参考： <code>https://blog.shipengx.com/archives/ef5b128d.html</code></li>
+</ul>
+<ol>
+<li>获取vscode的commit id, 打开vscode，查看 帮助&gt;关于&gt;提交</li>
+<li>下载链接： <a target="_blank" rel="noopener" href="https://update.code.visualstudio.com/commit:commit_id/server-linux-x64/stable">https://update.code.visualstudio.com/commit:commit_id/server-linux-x64/stable</a></li>
+<li>linux服务器上安装vscode-server</li>
+<li>操作如下：<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看vscode提交如： 384ff7382de624fb94dbaf6da11977bba1ecd427</span></span><br><span class="line">curl -sSL &quot;https://update.code.visualstudio.com/commit:384ff7382de624fb94dbaf6da11977bba1ecd427/server-linux-x64/stable&quot; -o vscode-server-linux-x64.tar.gz</span><br><span class="line">mkdir -p ~/.vscode-server/bin/384ff7382de624fb94dbaf6da11977bba1ecd427</span><br><span class="line">tar zxvf vscode-server-linux-x64.tar.gz -C ~/.vscode-server/bin/384ff7382de624fb94dbaf6da11977bba1ecd427 --strip 1</span><br></pre></td></tr></table></figure></li>
+</ol>
+<h2 id="vscode-web安装"><a href="#vscode-web安装" class="headerlink" title="vscode-web安装"></a>vscode-web安装</h2><h3 id="基本说明"><a href="#基本说明" class="headerlink" title="基本说明"></a>基本说明</h3><ul>
+<li>项目地址: <code>https://github.com/coder/code-server</code></li>
+<li>参考说明: <code>https://github.com/puxiao/notes/blob/master/Code-Server%E5%AE%89%E8%A3%85%E4%B8%8E%E4%BD%BF%E7%94%A8.md</code></li>
+<li>安装成功后，需要修改密码<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">bind-addr:</span> <span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span><span class="string">:8080</span></span><br><span class="line"><span class="attr">auth:</span> <span class="string">password</span></span><br><span class="line"><span class="attr">password:</span> <span class="string">b0sdfsfasdfasdf34242</span></span><br><span class="line"><span class="attr">cert:</span> <span class="literal">false</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="docker-安装使用"><a href="#docker-安装使用" class="headerlink" title="docker 安装使用"></a>docker 安装使用</h3><ul>
+<li>参考：<code>https://coder.com/docs/code-server/latest/install</code></li>
+<li>安装使用：<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">This will start a code-server container and expose it at http://127.0.0.1:8080.</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">It will also mount your current directory into the container as `/home/coder/project`</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">and forward your UID/GID so that all file system operations occur as your user outside</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">the container.</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"></span></span><br><span class="line"><span class="language-bash"><span class="comment"># Your $HOME/.config is mounted at $HOME/.config within the container to ensure you can</span></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">easily access/modify your code-server config <span class="keyword">in</span> <span class="variable">$HOME</span>/.config/code-server/config.json</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">outside the container.</span></span><br><span class="line">mkdir -p ~/.config</span><br><span class="line">docker run -it --name code-server -p 127.0.0.1:8080:8080 \</span><br><span class="line">  -v &quot;$HOME/.local:/home/coder/.local&quot; \</span><br><span class="line">  -v &quot;$HOME/.config:/home/coder/.config&quot; \</span><br><span class="line">  -v &quot;$PWD:/home/coder/project&quot; \</span><br><span class="line">  -u &quot;$(id -u):$(id -g)&quot; \</span><br><span class="line">  -e &quot;DOCKER_USER=$USER&quot; \</span><br><span class="line">  codercom/code-server:latest</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h3 id="二进制安装使用"><a href="#二进制安装使用" class="headerlink" title="二进制安装使用"></a>二进制安装使用</h3><ul>
+<li>参考： <code>https://cloud.tencent.com/developer/article/1845780</code></li>
+<li>安装使用<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">wget https://github.com/cdr/code-server/releases/download/v3.10.2/code-server-3.10.2-linux-amd64.tar.gz</span><br><span class="line">tar zxvf code-server-3.10.2-linux-amd64.tar.gz</span><br><span class="line">vim ~/.config/code-server/config.yaml</span><br><span class="line">cd code-server-3.10.2-linux-amd64</span><br><span class="line">./code-server</span><br></pre></td></tr></table></figure></li>
+</ul>
+<h2 id="使用技巧"><a href="#使用技巧" class="headerlink" title="使用技巧"></a>使用技巧</h2><ol>
+<li>C&#x2F;C++函数跳转：</li>
+</ol>
+<ul>
+<li>参考： <code>https://www.cnblogs.com/WangYangkai/p/15950539.html</code></li>
+<li>vscode安装<code>gnu global</code>插件，linux安装<code>gtags</code>工具，配置好vscode即可</li>
+</ul>
+<h2 id="插件"><a href="#插件" class="headerlink" title="插件"></a>插件</h2><ul>
+<li>remote-ssh: <code>https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-ssh</code></li>
+<li>gnu global: <code>https://marketplace.visualstudio.com/items?itemName=jaycetyle.vscode-gnu-global</code></li>
+<li>Chinese  : <code>https://marketplace.visualstudio.com/items?itemName=MS-CEINTL.vscode-language-pack-zh-hans</code></li>
+<li>drawio: <code>https://marketplace.visualstudio.com/items?itemName=eightHundreds.vscode-drawio</code></li>
+<li>rust: <code>https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer</code></li>
+<li>lua: <code>https://marketplace.visualstudio.com/items?itemName=sumneko.lua</code></li>
+<li>go: <code>https://marketplace.visualstudio.com/items?itemName=golang.Go</code></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://skippor.github.io/2024/12/05/work-vscode/" data-id="cm4b08i6g0008z0789f0beay8" data-title="vscode远程开发环境搭建" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vscode/" rel="tag">vscode</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/windows/" rel="tag">windows</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/work/" rel="tag">work</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2024/12/05/misc-shellcolor/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">前一篇</strong>
+      <div class="article-nav-title">
+        
+          Linux命令行颜色输出设置
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2024/12/05/work-openstick/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">随身Wifi刷机资料</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/concurrency/" rel="tag">concurrency</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dpdk/" rel="tag">dpdk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gm/" rel="tag">gm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/" rel="tag">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/" rel="tag">https</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ikev1/" rel="tag">ikev1</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ikev2/" rel="tag">ikev2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ipsec/" rel="tag">ipsec</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k3s/" rel="tag">k3s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kernel/" rel="tag">kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/" rel="tag">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/" rel="tag">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/network/" rel="tag">network</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/" rel="tag">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstick/" rel="tag">openstick</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ovs/" rel="tag">ovs</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/performance/" rel="tag">performance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/qemu/" rel="tag">qemu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rust/" rel="tag">rust</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/" rel="tag">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/socket/" rel="tag">socket</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/" rel="tag">ssl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/study/" rel="tag">study</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tips/" rel="tag">tips</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/" rel="tag">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wifi/" rel="tag">wifi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/" rel="tag">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/" rel="tag">work</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/concurrency/" style="font-size: 10px;">concurrency</a> <a href="/tags/dpdk/" style="font-size: 11.67px;">dpdk</a> <a href="/tags/gm/" style="font-size: 11.67px;">gm</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/ikev1/" style="font-size: 13.33px;">ikev1</a> <a href="/tags/ikev2/" style="font-size: 10px;">ikev2</a> <a href="/tags/ipsec/" style="font-size: 15px;">ipsec</a> <a href="/tags/k3s/" style="font-size: 11.67px;">k3s</a> <a href="/tags/kernel/" style="font-size: 16.67px;">kernel</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/network/" style="font-size: 10px;">network</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/openstick/" style="font-size: 10px;">openstick</a> <a href="/tags/ovs/" style="font-size: 10px;">ovs</a> <a href="/tags/performance/" style="font-size: 10px;">performance</a> <a href="/tags/qemu/" style="font-size: 10px;">qemu</a> <a href="/tags/rust/" style="font-size: 10px;">rust</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/socket/" style="font-size: 10px;">socket</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/study/" style="font-size: 11.67px;">study</a> <a href="/tags/tips/" style="font-size: 10px;">tips</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/wifi/" style="font-size: 10px;">wifi</a> <a href="/tags/windows/" style="font-size: 11.67px;">windows</a> <a href="/tags/work/" style="font-size: 18.33px;">work</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/12/">十二月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/03/">三月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/09/">九月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/06/">六月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/04/">四月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/03/">三月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/02/">二月 2023</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2024/12/14/linux-problem/">Linux网络之疑难杂症集合</a>
+          </li>
+        
+          <li>
+            <a href="/2024/12/05/misc-shellcolor/">Linux命令行颜色输出设置</a>
+          </li>
+        
+          <li>
+            <a href="/2024/12/05/work-vscode/">vscode远程开发环境搭建</a>
+          </li>
+        
+          <li>
+            <a href="/2024/12/05/work-openstick/">随身Wifi刷机资料</a>
+          </li>
+        
+          <li>
+            <a href="/2024/12/05/windows-cron/">WINDOWS定时任务通知</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2024 Skippor<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.4.1.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
