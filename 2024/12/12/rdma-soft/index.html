@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>Linux软件RDMA环境搭建 | Skippor&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="Linux软件RDMA环境搭建">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux软件RDMA环境搭建">
+<meta property="og:url" content="https://skippor.github.io/2024/12/12/rdma-soft/index.html">
+<meta property="og:site_name" content="Skippor&#39;s Blog">
+<meta property="og:description" content="Linux软件RDMA环境搭建">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-12-12T19:52:05.000Z">
+<meta property="article:modified_time" content="2024-12-12T12:01:29.017Z">
+<meta property="article:author" content="Skippor">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="kernel">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Skippor's Blog" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Skippor&#39;s Blog</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://skippor.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-rdma-soft" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2024/12/12/rdma-soft/" class="article-date">
+  <time class="dt-published" datetime="2024-12-12T19:52:05.000Z" itemprop="datePublished">2024-12-12</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      Linux软件RDMA环境搭建
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="Linux软件RDMA环境搭建"><a href="#Linux软件RDMA环境搭建" class="headerlink" title="Linux软件RDMA环境搭建"></a>Linux软件RDMA环境搭建</h2><h3 id="软件RDMA部署步骤"><a href="#软件RDMA部署步骤" class="headerlink" title="软件RDMA部署步骤"></a>软件RDMA部署步骤</h3><p>centos 6.8  安装<br>系统：<br>采用VMware虚拟机安装，网卡模式选择桥接模式。（选择nat模式会配置失败！）<br>如果机器是desk版的，启用NetworkManager 服务<br>如果机器是minimal版，不用管NetworkManager服务</p>
+<h4 id="1、安装依赖包"><a href="#1、安装依赖包" class="headerlink" title="1、安装依赖包"></a>1、安装依赖包</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">yum install epel-release -y</span><br><span class="line">yum install gcc gcc-c++ bc openssl-devel automake ncurses-devel libibverbs ncurses* -y</span><br><span class="line">yum install libibverbs-devel libibverbs-utils librdmacm librdmacm-devel librdmacm-utils perl-Switch elfutils-libelf-devel  -y</span><br></pre></td></tr></table></figure>
+
+<h4 id="2、-librxe-dev-和-rxe-dev下载"><a href="#2、-librxe-dev-和-rxe-dev下载" class="headerlink" title="2、 librxe-dev 和 rxe-dev下载"></a>2、 librxe-dev 和 rxe-dev下载</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">下载地址:</span><br><span class="line">Github: https://github.com/SoftRoCE/rxe-dev.git # 备注：rxe-dev下载v18版本，即rxe-dev-rxesubmissionv18</span><br><span class="line">Github: https://github.com/SoftRoCE/librxe-dev.git   #这个选择1.0.0版本的</span><br></pre></td></tr></table></figure>
+
+<h4 id="3、安装rxe-dev"><a href="#3、安装rxe-dev" class="headerlink" title="3、安装rxe-dev"></a>3、安装rxe-dev</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">unzip rxe-dev-rxe_submission_v18.zip</span><br><span class="line">cd rxe-dev-rxe_submission_v18/</span><br><span class="line">cp /boot/config-3.10.0-514.el7.x86_64 .config</span><br><span class="line">make menuconfig</span><br><span class="line">     #会出现选择界面（如果没出现，需要安装 ncurse-devel）</span><br><span class="line">     #输入 &quot;/&quot; ，然后输入 rxe，按下 enter，会查找有关 rxe 的选择项。</span><br><span class="line">     #输入数字 1，就会选择到“Software RDMA over Ethernet (ROCE) driver”的设#置，输入 &quot;M&quot; ，选中 RDMA 的配置，如果 输不了 M，那就输入空格。</span><br><span class="line">     #移动到保存按钮，回车，装保存到.config中，退出安装界面（exit）。</span><br><span class="line">vi .config   #来确认一下三项：</span><br><span class="line">                 CONFIG_RDMA_RXE 为 m</span><br><span class="line">                 CONFIG_INFINIBAND_ADDR_TRANS 和</span><br><span class="line">                 CONFIG_INFINIBAND_ADDR_TRANS_CONFIGFS 为 y</span><br><span class="line"></span><br><span class="line">make -j 4              # -j  指定CPU核数的，提高编译速度的。</span><br><span class="line">make modules_install   # 可能执行中途 会提示 丢失一些 module，这个 没关系，无关紧要。</span><br><span class="line">make install           # 可能执行中途 会提示 丢失一些 module，这个 没关系，无关紧要。</span><br><span class="line">make headers_install INSTALL_HDR_PATH=/usr</span><br><span class="line">vim /etc/grub.conf     # 确认新的内核是否在 grub 引导中。查看 /etc/grub.cfg 即可看见。在开机的时候可以选择 新内核启动</span><br></pre></td></tr></table></figure>
+
+<h4 id="4、安装-librxe-dev"><a href="#4、安装-librxe-dev" class="headerlink" title="4、安装 librxe-dev"></a>4、安装 librxe-dev</h4><p>先按照：MLAN—软件包（见另外一个文档）(centos6.8这一步可以忽略)</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">centos6.8的系统忽略这一步：</span><br><span class="line">yum -y install tcl tk</span><br><span class="line">tar -zxvf MLNX_OFED_LINUX-4.2-1.2.0.0-rhel7.4-x86_64.tgz</span><br><span class="line">cd MLNX_OFED_LINUX-4.2-1.2.0.0-rhel7.4</span><br><span class="line">./mlnxofedinstall</span><br><span class="line">/etc/init.d/openibd start</span><br><span class="line">/etc/init.d/opensmd start</span><br><span class="line">chkconfig openibd on</span><br><span class="line">chkconfig opensmd on</span><br><span class="line">ibstat</span><br><span class="line"><span class="meta prompt_">----&gt; </span><span class="language-bash">status: Active</span></span><br><span class="line"></span><br><span class="line">unzip librxe-dev-librxe-1.0.0.zip</span><br><span class="line">cd librxe-dev</span><br><span class="line">./configure --libdir=/usr/lib64/ --prefix=</span><br><span class="line">make</span><br><span class="line">make install</span><br><span class="line">reboot      #  重启操作系统，在开机启动时，选择4.7.0-rc3内核!!!</span><br><span class="line">uname -r     #  启动后，查看内核版本，是否是4.7的版本</span><br></pre></td></tr></table></figure>
+
+<h4 id="5、验证-rdma-依次输入一下命令"><a href="#5、验证-rdma-依次输入一下命令" class="headerlink" title="5、验证 rdma (依次输入一下命令)"></a>5、验证 rdma (依次输入一下命令)</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">[root@ab ~]# rxe_cfg start</span><br><span class="line">  Name        Link  Driver  Speed  NMTU  IPv4_addr  RDEV  RMTU</span><br><span class="line">  eth0        yes   e1000</span><br><span class="line"></span><br><span class="line">[root@ab ~]# rxe_cfg add eth0      # centos7.3 就是ens33</span><br><span class="line"></span><br><span class="line">[root@ab ~]# rxe_cfg status</span><br><span class="line">  Name        Link  Driver  Speed  NMTU  IPv4_addr  RDEV  RMTU</span><br><span class="line">  eth0         yes   e1000                           rxe0  1024  (3)</span><br><span class="line">  virbr0      no    bridge</span><br><span class="line">  virbr0-nic  no    tun</span><br><span class="line">查看rxe设备</span><br><span class="line">ibvdevices 程序显示该系统中目前所有设备，而 ibvdevinfo 命令会给出每个设备的具体信息</span><br><span class="line"></span><br><span class="line">[root@ab ~]# ibv_devices</span><br><span class="line">    device                 node GUID</span><br><span class="line">    ------              ----------------</span><br><span class="line">    rxe0                020c29fffe55c818</span><br><span class="line">[root@ab ~]# ibv_devinfo  rxe0</span><br><span class="line">hca_id:    rxe0</span><br><span class="line">    transport:            InfiniBand (0)</span><br><span class="line">    fw_ver:                0.0.0</span><br><span class="line">    node_guid:            021c:29dd:fe55:c818</span><br><span class="line">    sys_image_guid:            0000:0000:0000:0000</span><br><span class="line">    vendor_id:            0x0000</span><br><span class="line">    vendor_part_id:            0</span><br><span class="line">    hw_ver:                0x0</span><br><span class="line">    phys_port_cnt:            1</span><br><span class="line">        port:    1</span><br><span class="line">            state:            PORT_ACTIVE (4)</span><br><span class="line">            max_mtu:        4096 (5)</span><br><span class="line">            active_mtu:        1024 (3)</span><br><span class="line">            sm_lid:            0</span><br><span class="line">            port_lid:        0</span><br><span class="line">            port_lmc:        0x00</span><br><span class="line">            link_layer:        Ethernet</span><br></pre></td></tr></table></figure>
+
+<h4 id="6、softRoCE连通性测试"><a href="#6、softRoCE连通性测试" class="headerlink" title="6、softRoCE连通性测试"></a>6、softRoCE连通性测试</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">服务端IP为：192.168.1.10，在服务端开启RDMA</span><br><span class="line">rping -s -a 192.168.1.10 -v -C 10</span><br><span class="line">出现的等待窗口，</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">客户端IP为：192.168.1.34，按照同样的方式安装RDMA（因为rping的命令需要使用以上软件的安装才能生成）</span><br><span class="line">rping -c -a 192.168.1.10 -v -C 10</span><br><span class="line"></span><br><span class="line">[root@bogon ~]# rping  -c -a 192.168.1.10 -v -C 10</span><br><span class="line">ping data: rdma-ping-0: ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqr</span><br><span class="line">ping data: rdma-ping-1: BCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrs</span><br><span class="line">ping data: rdma-ping-2: CDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrst</span><br><span class="line">ping data: rdma-ping-3: DEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstu</span><br><span class="line">ping data: rdma-ping-4: EFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuv</span><br><span class="line">ping data: rdma-ping-5: FGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvw</span><br><span class="line">ping data: rdma-ping-6: GHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwx</span><br><span class="line">ping data: rdma-ping-7: HIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxy</span><br><span class="line">ping data: rdma-ping-8: IJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz</span><br><span class="line">ping data: rdma-ping-9: JKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyzA</span><br><span class="line"></span><br><span class="line">此时的服务端会出现一下信息：</span><br><span class="line">[root@jack ~]# rping -s -a 192.168.1.10 -v -C 10</span><br><span class="line">server ping data: rdma-ping-0: ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqr</span><br><span class="line">server ping data: rdma-ping-1: BCDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrs</span><br><span class="line">server ping data: rdma-ping-2: CDEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrst</span><br><span class="line">server ping data: rdma-ping-3: DEFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstu</span><br><span class="line">server ping data: rdma-ping-4: EFGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuv</span><br><span class="line">server ping data: rdma-ping-5: FGHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvw</span><br><span class="line">server ping data: rdma-ping-6: GHIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwx</span><br><span class="line">server ping data: rdma-ping-7: HIJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxy</span><br><span class="line">server ping data: rdma-ping-8: IJKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyz</span><br><span class="line">server ping data: rdma-ping-9: JKLMNOPQRSTUVWXYZ[\]^_`abcdefghijklmnopqrstuvwxyzA</span><br><span class="line">server DISCONNECT EVENT...</span><br><span class="line">wait for RDMA_READ_ADV state 10</span><br></pre></td></tr></table></figure>
+
+<p>下面的这个软件不知道有个什么用？&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&gt; 用于生成客户端的rping命令的，这样客户端还是要安装rdma的。否则不成功。</p>
+<h4 id="7、关于librdmacm编译说明"><a href="#7、关于librdmacm编译说明" class="headerlink" title="7、关于librdmacm编译说明"></a>7、关于librdmacm编译说明</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">git clone https://github.com/ofiwg/librdmacm.git</span><br><span class="line">cd librdmacm</span><br><span class="line">yum install autoconf automake gettext gettext-devel libtool libibverbs* -y</span><br><span class="line">./autogen.sh</span><br><span class="line">./configure</span><br><span class="line">make</span><br><span class="line">make install</span><br></pre></td></tr></table></figure>
+
+<h4 id="8、常见问题"><a href="#8、常见问题" class="headerlink" title="8、常见问题"></a>8、常见问题</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(1)如果你克隆虚机，需要解决网卡问题</span><br><span class="line">(2)使用rdma，请将防火墙与selinx关闭</span><br></pre></td></tr></table></figure>
+
+<h2 id="参考原文"><a href="#参考原文" class="headerlink" title="参考原文"></a>参考原文</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http://corasql.blog.51cto.com/5908329/1930455</span><br><span class="line">https://www.cnblogs.com/kaishirenshi/p/9550441.html</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://skippor.github.io/2024/12/12/rdma-soft/" data-id="cm4ladzy900041b783c19081o" data-title="Linux软件RDMA环境搭建" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kernel/" rel="tag">kernel</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/" rel="tag">linux</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2024/12/14/linux-problem/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">前一篇</strong>
+      <div class="article-nav-title">
+        
+          Linux网络之疑难杂症集合
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2024/12/12/linux-net-send/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">Linux内核网络之发包</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/concurrency/" rel="tag">concurrency</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dpdk/" rel="tag">dpdk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gm/" rel="tag">gm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/" rel="tag">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/" rel="tag">https</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ikev1/" rel="tag">ikev1</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ikev2/" rel="tag">ikev2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ipsec/" rel="tag">ipsec</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k3s/" rel="tag">k3s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kernel/" rel="tag">kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/" rel="tag">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/" rel="tag">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/network/" rel="tag">network</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/" rel="tag">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstick/" rel="tag">openstick</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ovs/" rel="tag">ovs</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/performance/" rel="tag">performance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/qemu/" rel="tag">qemu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rust/" rel="tag">rust</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/" rel="tag">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/socket/" rel="tag">socket</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/" rel="tag">ssl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/study/" rel="tag">study</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tips/" rel="tag">tips</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/" rel="tag">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wifi/" rel="tag">wifi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/" rel="tag">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/" rel="tag">work</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/concurrency/" style="font-size: 10px;">concurrency</a> <a href="/tags/dpdk/" style="font-size: 11.67px;">dpdk</a> <a href="/tags/gm/" style="font-size: 11.67px;">gm</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/ikev1/" style="font-size: 13.33px;">ikev1</a> <a href="/tags/ikev2/" style="font-size: 10px;">ikev2</a> <a href="/tags/ipsec/" style="font-size: 15px;">ipsec</a> <a href="/tags/k3s/" style="font-size: 11.67px;">k3s</a> <a href="/tags/kernel/" style="font-size: 16.67px;">kernel</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/network/" style="font-size: 13.33px;">network</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/openstick/" style="font-size: 10px;">openstick</a> <a href="/tags/ovs/" style="font-size: 10px;">ovs</a> <a href="/tags/performance/" style="font-size: 10px;">performance</a> <a href="/tags/qemu/" style="font-size: 10px;">qemu</a> <a href="/tags/rust/" style="font-size: 10px;">rust</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/socket/" style="font-size: 10px;">socket</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/study/" style="font-size: 11.67px;">study</a> <a href="/tags/tips/" style="font-size: 10px;">tips</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/wifi/" style="font-size: 10px;">wifi</a> <a href="/tags/windows/" style="font-size: 11.67px;">windows</a> <a href="/tags/work/" style="font-size: 18.33px;">work</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/12/">十二月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/03/">三月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/09/">九月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/06/">六月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/04/">四月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/03/">三月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/02/">二月 2023</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2024/12/14/linux-problem/">Linux网络之疑难杂症集合</a>
+          </li>
+        
+          <li>
+            <a href="/2024/12/12/rdma-soft/">Linux软件RDMA环境搭建</a>
+          </li>
+        
+          <li>
+            <a href="/2024/12/12/linux-net-send/">Linux内核网络之发包</a>
+          </li>
+        
+          <li>
+            <a href="/2024/12/12/linux-net-recv/">Linux内核网络之收包</a>
+          </li>
+        
+          <li>
+            <a href="/2024/12/05/misc-shellcolor/">Linux命令行颜色输出设置</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2024 Skippor<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.4.1.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
