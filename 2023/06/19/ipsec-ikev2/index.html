@@ -6,18 +6,19 @@
   
   <title>IPSec之IKEV2协商过程解析 | Skippor&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="准备">
+  <meta name="description" content="IPSec之IKEV2协商过程解析">
 <meta property="og:type" content="article">
 <meta property="og:title" content="IPSec之IKEV2协商过程解析">
 <meta property="og:url" content="https://skippor.github.io/2023/06/19/ipsec-ikev2/index.html">
 <meta property="og:site_name" content="Skippor&#39;s Blog">
-<meta property="og:description" content="准备">
+<meta property="og:description" content="IPSec之IKEV2协商过程解析">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-06-19T16:36:03.000Z">
-<meta property="article:modified_time" content="2024-12-12T12:33:15.011Z">
+<meta property="article:modified_time" content="2024-12-17T08:13:57.165Z">
 <meta property="article:author" content="Skippor">
 <meta property="article:tag" content="ipsec">
 <meta property="article:tag" content="ikev2">
+<meta property="article:tag" content="vpn">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternate" href="/atom.xml" title="Skippor's Blog" type="application/atom+xml">
@@ -97,7 +98,93 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><h2 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h2><h2 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h2>
+        <h1 id="IPSec之IKEV2协商过程解析"><a href="#IPSec之IKEV2协商过程解析" class="headerlink" title="IPSec之IKEV2协商过程解析"></a>IPSec之IKEV2协商过程解析</h1><h2 id="IKEv2协商流程"><a href="#IKEv2协商流程" class="headerlink" title="IKEv2协商流程"></a>IKEv2协商流程</h2><h3 id="IKEv2交换的初始阶段"><a href="#IKEv2交换的初始阶段" class="headerlink" title="IKEv2交换的初始阶段"></a>IKEv2交换的初始阶段</h3><p>实际上，IKEv2只有两个初始协商阶段：</p>
+<ul>
+<li>IKE_SA_INIT交换</li>
+<li>IKE_AUTH交换</li>
+</ul>
+<h4 id="IKE-SA-INIT交换"><a href="#IKE-SA-INIT交换" class="headerlink" title="IKE_SA_INIT交换:"></a>IKE_SA_INIT交换:</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"> Initiator                                  Responder</span><br><span class="line">-----------                                -----------</span><br><span class="line">HDR, SAi1, KEi, Ni          --&gt;</span><br><span class="line">                            &lt;--    HDR, SAr1, KEr, Nr, [CERTREQ]</span><br></pre></td></tr></table></figure>
+<p>带COOKIE notify：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"> Initiator                          Responder</span><br><span class="line">-----------                        -----------</span><br><span class="line">HDR(A,0), SAi1, KEi, Ni   --&gt;</span><br><span class="line"></span><br><span class="line">                          &lt;-- HDR(A,0), N(COOKIE)</span><br><span class="line"></span><br><span class="line">HDR(A,0), N(COOKIE), SAi1, KEi, Ni   --&gt;</span><br><span class="line"></span><br><span class="line">                          &lt;-- HDR(A,B), SAr1, KEr, Nr, [CERTREQ]</span><br><span class="line"></span><br><span class="line">HDR(A,B), SK &#123;IDi, [CERT,] [CERTREQ,] [IDr,]</span><br><span class="line">    AUTH, SAi2, TSi, TSr&#125; --&gt;</span><br><span class="line"></span><br><span class="line">                          &lt;-- HDR(A,B), SK &#123;IDr, [CERT,] AUTH,</span><br><span class="line">                                         SAr2, TSi, TSr&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>IKE_SA_INIT是对等体在其中建立安全信道的初始交换。完成初始交换后，所有进一步的交换都将加密。交换仅包含两个数据包，因为它将IKEv1中通常在MM1-4中交换的所有信息合并在一起。因此，响应方处理IKE_SA_INIT数据包的计算成本很高，可以离开以处理第一个数据包；它使协议对欺骗地址的DOS攻击保持开放。</li>
+<li>为了防止此类攻击，IKEv2在IKE_SA_INIT内有一个可选交换，以防止欺骗攻击。如果达到不完整会话的特定阈值，响应方不会进一步处理数据包，而是使用cookie向发起方发送响应。要使会话继续，发起方必须重新发送IKE_SA_INIT数据包并包括其收到的cookie。</li>
+<li>发起方重新发送初始数据包以及响应方的通知负载，证明原始交换未欺骗。</li>
+</ol>
+<h4 id="IKE-AUTH交换"><a href="#IKE-AUTH交换" class="headerlink" title="IKE_AUTH交换"></a>IKE_AUTH交换</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"> Initiator                                  Responder</span><br><span class="line">-----------                                -----------</span><br><span class="line">HDR, SK &#123;IDi, [CERT,]</span><br><span class="line">[CERTREQ,] [IDr,]</span><br><span class="line">AUTH, SAi2, TSi, TSr&#125;       --&gt;</span><br><span class="line">                            &lt;--    HDR, SK &#123;IDr, [CERT,] AUTH,</span><br><span class="line">                                        SAr2, TSi, TSr&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>在IKE_SA_INIT交换完成后，IKEv2 SA被加密；但是，远程对等体尚未通过身份验证。IKE_AUTH交换用于对远程对等体进行身份验证并创建第一个IPsec SA。</li>
+<li>交换包含互联网安全关联和密钥管理协议(ISAKMP)ID以及身份验证负载。身份验证负载的内容取决于身份验证方法，身份验证方法可以是预共享密钥(PSK)、RSA证书(RSA-SIG)、椭圆曲线数字签名算法证书(ECDSA-SIG)或EAP。除身份验证负载外，交换还包括描述要创建的IPsec SA的SA和流量选择器负载。</li>
+</ol>
+<h3 id="更新IKEv2交换"><a href="#更新IKEv2交换" class="headerlink" title="更新IKEv2交换"></a>更新IKEv2交换</h3><h4 id="CREATE-CHILD-SA交换"><a href="#CREATE-CHILD-SA交换" class="headerlink" title="CREATE_CHILD_SA交换"></a>CREATE_CHILD_SA交换</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"> Initiator                                 Responder</span><br><span class="line">-----------                               -----------</span><br><span class="line"> HDR, SK &#123;[N], SA, Ni, [KEi],</span><br><span class="line">     [TSi, TSr]&#125;              --&gt;</span><br><span class="line">                              &lt;--    HDR, SK &#123;SA, Nr, [KEr],</span><br><span class="line">                                         [TSi, TSr]&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>如果需要其他子SA，或者如果需要重新键入IKE SA或其中一个子SA，则它的功能与快速模式交换在IKEv1中的功能相同。每重新生成密钥或新SA都会重复交换。</li>
+</ol>
+<h4 id="INFORMATIONAL交换"><a href="#INFORMATIONAL交换" class="headerlink" title="INFORMATIONAL交换"></a>INFORMATIONAL交换</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"> Initiator                        Responder</span><br><span class="line">-----------                      -----------</span><br><span class="line"> HDR, SK &#123;[N,] [D,] [CP,] ...&#125; --&gt;</span><br><span class="line">                             &lt;-- HDR, SK &#123;[N,] [D,] [CP], ...&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><ol>
+<li>由于它在所有IKEv2交换中，每个信息交换请求都需要响应。信息交换中可包含三种负载类型。可以包括任意数量的负载组合。</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>删除负载(D)通知对等体发送方已删除一个或多个传入SA。响应方应删除这些SA，并且通常在响应消息中包括在另一方向对应的SA的删除负载。</li>
+</ol>
+</li>
+<li><ol start="3">
+<li>配置负载(CP)用于在对等体之间协商配置数据。CP的一个重要用途是请求（请求）和在受安全网关保护的网络上分配（响应）地址。在典型情况下，移动主机在其家庭网络上建立具有安全网关的虚拟专用网络(VPN)，并请求在家庭网络上为其分配IP地址。</li>
+</ol>
+<ul>
+<li>注意：这可消除第2层隧道协议(L2TP)和IPsec的组合使用所要解决的问题之一。</li>
+</ul>
+</li>
+</ul>
+<h3 id="密钥材料计算"><a href="#密钥材料计算" class="headerlink" title="密钥材料计算"></a>密钥材料计算</h3><p>长度不够，重复计算来凑：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">prf+ (K,S) = T1 | T2 | T3 | T4 | ...</span><br><span class="line"></span><br><span class="line"> where:</span><br><span class="line"> T1 = prf (K, S | 0x01)</span><br><span class="line"> T2 = prf (K, T1 | S | 0x02)</span><br><span class="line"> T3 = prf (K, T2 | S | 0x03)</span><br><span class="line"> T4 = prf (K, T3 | S | 0x04)</span><br></pre></td></tr></table></figure>
+<p>各密钥计算：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SKEYSEED = prf(Ni | Nr, g^ir)</span><br><span class="line"></span><br><span class="line">&#123;SK_d | SK_ai | SK_ar | SK_ei | SK_er | SK_pi | SK_pr &#125; = prf+ (SKEYSEED, Ni | Nr | SPIi | SPIr )</span><br></pre></td></tr></table></figure>
+<ul>
+<li>SKEYSEED: 用于计算其他七个秘密。</li>
+<li>SK_d: 用于为使用此IKE_SA建立的子SA导出新密钥。</li>
+<li>SK_ai和SK_ar: 用作完整性保护算法的密钥，用于验证后续交换的组件消息。</li>
+<li>SK_ei和SK_er: 用于加密（当然还有解密）所有后续交换。</li>
+<li>SK_pi和SK_pr: 它们在生成身份验证有效负载时使用。</li>
+</ul>
+<h2 id="IKEv1和IKEv2有哪些区别"><a href="#IKEv1和IKEv2有哪些区别" class="headerlink" title="IKEv1和IKEv2有哪些区别"></a>IKEv1和IKEv2有哪些区别</h2><h4 id="1-协商过程不同"><a href="#1-协商过程不同" class="headerlink" title="1. 协商过程不同"></a>1. 协商过程不同</h4><ul>
+<li>IKEv1协商安全联盟主要分为两个阶段。IKEv1阶段1的目的是建立IKE SA，它支持两种协商模式：主模式和野蛮模式。主模式用6条ISAKMP消息完成协商。野蛮模式用3条ISAKMP消息完成协商。野蛮模式的优点是建立IKE SA的速度较快。但是由于野蛮模式密钥交换与身份认证一起进行无法提供身份保护。IKEv1阶段2的目的就是建立用来传输数据的IPSec SA，通过快速交换模式（3条ISAKMP消息）完成协商。</li>
+<li>IKEv2简化了安全联盟的协商过程。IKEv2正常情况使用2次交换共4条消息就可以完成一个IKE SA和一对IPSec SA，如果要求建立的IPSec SA大于一对时，每一对SA只需额外增加1次交换，也就是2条消息就可以完成。</li>
+</ul>
+<h4 id="2-认证方法不同"><a href="#2-认证方法不同" class="headerlink" title="2. 认证方法不同"></a>2. 认证方法不同</h4><ul>
+<li>IKEv2支持EAP身份认证。IKEv2可以借助认证服务器对远程接入的PC、手机等进行身份认证、分配私网IP地址。</li>
+<li>IKEv1无法提供此功能，必须借助L2TP来分配私网地址。</li>
+</ul>
+<h4 id="3-IKE-SA的完整性算法支持情况不同"><a href="#3-IKE-SA的完整性算法支持情况不同" class="headerlink" title="3. IKE SA的完整性算法支持情况不同"></a>3. IKE SA的完整性算法支持情况不同</h4><ul>
+<li>IKE SA的完整性算法仅IKEv2支持。</li>
+<li>IKEv1不支持。</li>
+</ul>
+<h4 id="4-DPD中超时重传实现不同"><a href="#4-DPD中超时重传实现不同" class="headerlink" title="4. DPD中超时重传实现不同"></a>4. DPD中超时重传实现不同</h4><ul>
+<li>retry-interval参数仅IKEv1支持。表示发送DPD报文后，如果超过此时间间隔未收到正确的应答报文，DPD记录失败事件1次。当失败事件达到5次时，删除IKE SA和相应的IPSec SA。直到隧道中有流量时，两端重新协商建立IKE SA。</li>
+<li>对于IKEv2方式的IPSec SA，超时重传时间间隔从1到64以指数增长的方式增加。在8次尝试后还未收到对端发过来的报文，则认为对端已经下线，删除IKE SA和相应的IPSec SA。</li>
+</ul>
+<h4 id="5-IKE-SA超时时间手工调整功能支持不同"><a href="#5-IKE-SA超时时间手工调整功能支持不同" class="headerlink" title="5. IKE SA超时时间手工调整功能支持不同"></a>5. IKE SA超时时间手工调整功能支持不同</h4><ul>
+<li>IKEv2的IKE SA软超时为硬超时的9&#x2F;10±一个随机数，所以IKEv2一般不存在两端同时发起重协商的情况，故IKEv2不需要配置软超时时间。</li>
+</ul>
+<h4 id="6-IPSec-SA超时时间手工调整功能支持不同"><a href="#6-IPSec-SA超时时间手工调整功能支持不同" class="headerlink" title="6. IPSec SA超时时间手工调整功能支持不同"></a>6. IPSec SA超时时间手工调整功能支持不同</h4><ul>
+<li>IKEv2的IKE SA软超时为硬超时的9&#x2F;10±一个随机数，所以IKEv2一般不存在两端同时发起重协商的情况，故IKEv2不需要配置软超时时间。</li>
+</ul>
+<h2 id="strongswan配置IKEv2"><a href="#strongswan配置IKEv2" class="headerlink" title="strongswan配置IKEv2"></a>strongswan配置IKEv2</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://www.cisco.com/c/zh_cn/support/docs/ip/internet-key-exchange-ike/117258-config-l2l.html">Cisco IOS和StrongSwan之间的IKEv1&#x2F;IKEv2配置示例</a></li>
+<li><a target="_blank" rel="noopener" href="https://taoshu.in/net/ipsec-strongswan-ikev2.html">基于 strongSwan 配置 IPsec IKEv2 VPN</a></li>
+<li><a target="_blank" rel="noopener" href="https://gist.github.com/daimajia/b3ac7687e77e6fade889">linux上用strongswan搭建ikev2协议vpn</a></li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://datatracker.ietf.org/doc/html/rfc4306">Internet Key Exchange (IKEv2) Protocol</a></li>
+<li><a target="_blank" rel="noopener" href="https://rfc2cn.com/rfc4306.html">RFC 4306: Internet Key Exchange (IKEv2) Protocol 中文翻译</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cisco.com/c/zh_cn/support/docs/security-vpn/ipsec-negotiation-ike-protocols/115936-understanding-ikev2-packet-exch-debug.html">IKEv2数据包交换和协议级调试</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7108746640248274958">密钥交换协议之IKEv2</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7109118166193668104">IKEv2协议协商流程: （IKE-SA-INIT 交换）第一包</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7109118741194997797">IKEv2协议协商流程: （IKE-SA-INIT 交换）第二包</a></li>
+</ul>
+
       
     </div>
     <footer class="article-footer">
@@ -105,7 +192,7 @@
       
       
       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ikev2/" rel="tag">ikev2</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ipsec/" rel="tag">ipsec</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ikev2/" rel="tag">ikev2</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/ipsec/" rel="tag">ipsec</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vpn/" rel="tag">vpn</a></li></ul>
 
     </footer>
   </div>
@@ -145,7 +232,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/cert/" rel="tag">cert</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/concurrency/" rel="tag">concurrency</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dpdk/" rel="tag">dpdk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ebpf/" rel="tag">ebpf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gm/" rel="tag">gm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/" rel="tag">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/" rel="tag">https</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ikev1/" rel="tag">ikev1</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ikev2/" rel="tag">ikev2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ipsec/" rel="tag">ipsec</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k3s/" rel="tag">k3s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kernel/" rel="tag">kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/" rel="tag">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/" rel="tag">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/network/" rel="tag">network</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/" rel="tag">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstick/" rel="tag">openstick</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ovs/" rel="tag">ovs</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/performance/" rel="tag">performance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/qemu/" rel="tag">qemu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reprint/" rel="tag">reprint</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rust/" rel="tag">rust</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rxe/" rel="tag">rxe</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/" rel="tag">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/siw/" rel="tag">siw</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/socket/" rel="tag">socket</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/" rel="tag">ssl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/study/" rel="tag">study</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tips/" rel="tag">tips</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/" rel="tag">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wifi/" rel="tag">wifi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/" rel="tag">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/" rel="tag">work</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xdp/" rel="tag">xdp</a></li></ul>
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/cert/" rel="tag">cert</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/concurrency/" rel="tag">concurrency</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dpdk/" rel="tag">dpdk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ebpf/" rel="tag">ebpf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gm/" rel="tag">gm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/" rel="tag">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/" rel="tag">https</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ikev1/" rel="tag">ikev1</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ikev2/" rel="tag">ikev2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ipsec/" rel="tag">ipsec</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k3s/" rel="tag">k3s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kernel/" rel="tag">kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/" rel="tag">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/" rel="tag">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/network/" rel="tag">network</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/" rel="tag">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstick/" rel="tag">openstick</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ovs/" rel="tag">ovs</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/performance/" rel="tag">performance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/qemu/" rel="tag">qemu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reprint/" rel="tag">reprint</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rust/" rel="tag">rust</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rxe/" rel="tag">rxe</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/" rel="tag">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/siw/" rel="tag">siw</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/socket/" rel="tag">socket</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/" rel="tag">ssl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/study/" rel="tag">study</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tips/" rel="tag">tips</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vpn/" rel="tag">vpn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/" rel="tag">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wifi/" rel="tag">wifi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/" rel="tag">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wireguard/" rel="tag">wireguard</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/" rel="tag">work</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xdp/" rel="tag">xdp</a></li></ul>
     </div>
   </div>
 
@@ -155,7 +242,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/cert/" style="font-size: 10px;">cert</a> <a href="/tags/concurrency/" style="font-size: 10px;">concurrency</a> <a href="/tags/dpdk/" style="font-size: 11.67px;">dpdk</a> <a href="/tags/ebpf/" style="font-size: 11.67px;">ebpf</a> <a href="/tags/gm/" style="font-size: 11.67px;">gm</a> <a href="/tags/hexo/" style="font-size: 11.67px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/ikev1/" style="font-size: 13.33px;">ikev1</a> <a href="/tags/ikev2/" style="font-size: 10px;">ikev2</a> <a href="/tags/ipsec/" style="font-size: 15px;">ipsec</a> <a href="/tags/k3s/" style="font-size: 11.67px;">k3s</a> <a href="/tags/kernel/" style="font-size: 18.33px;">kernel</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/network/" style="font-size: 13.33px;">network</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/openstick/" style="font-size: 10px;">openstick</a> <a href="/tags/ovs/" style="font-size: 10px;">ovs</a> <a href="/tags/performance/" style="font-size: 11.67px;">performance</a> <a href="/tags/qemu/" style="font-size: 11.67px;">qemu</a> <a href="/tags/reprint/" style="font-size: 16.67px;">reprint</a> <a href="/tags/rust/" style="font-size: 10px;">rust</a> <a href="/tags/rxe/" style="font-size: 10px;">rxe</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/siw/" style="font-size: 10px;">siw</a> <a href="/tags/socket/" style="font-size: 10px;">socket</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/study/" style="font-size: 11.67px;">study</a> <a href="/tags/tips/" style="font-size: 10px;">tips</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/wifi/" style="font-size: 10px;">wifi</a> <a href="/tags/windows/" style="font-size: 11.67px;">windows</a> <a href="/tags/work/" style="font-size: 18.33px;">work</a> <a href="/tags/xdp/" style="font-size: 10px;">xdp</a>
+      <a href="/tags/cert/" style="font-size: 10px;">cert</a> <a href="/tags/concurrency/" style="font-size: 10px;">concurrency</a> <a href="/tags/dpdk/" style="font-size: 11.67px;">dpdk</a> <a href="/tags/ebpf/" style="font-size: 11.67px;">ebpf</a> <a href="/tags/gm/" style="font-size: 11.67px;">gm</a> <a href="/tags/hexo/" style="font-size: 11.67px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/ikev1/" style="font-size: 13.33px;">ikev1</a> <a href="/tags/ikev2/" style="font-size: 10px;">ikev2</a> <a href="/tags/ipsec/" style="font-size: 15px;">ipsec</a> <a href="/tags/k3s/" style="font-size: 11.67px;">k3s</a> <a href="/tags/kernel/" style="font-size: 18.33px;">kernel</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/network/" style="font-size: 15px;">network</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/openstick/" style="font-size: 10px;">openstick</a> <a href="/tags/ovs/" style="font-size: 10px;">ovs</a> <a href="/tags/performance/" style="font-size: 11.67px;">performance</a> <a href="/tags/qemu/" style="font-size: 11.67px;">qemu</a> <a href="/tags/reprint/" style="font-size: 16.67px;">reprint</a> <a href="/tags/rust/" style="font-size: 10px;">rust</a> <a href="/tags/rxe/" style="font-size: 10px;">rxe</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/siw/" style="font-size: 10px;">siw</a> <a href="/tags/socket/" style="font-size: 10px;">socket</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/study/" style="font-size: 11.67px;">study</a> <a href="/tags/tips/" style="font-size: 10px;">tips</a> <a href="/tags/vpn/" style="font-size: 15px;">vpn</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/wifi/" style="font-size: 10px;">wifi</a> <a href="/tags/windows/" style="font-size: 11.67px;">windows</a> <a href="/tags/wireguard/" style="font-size: 10px;">wireguard</a> <a href="/tags/work/" style="font-size: 18.33px;">work</a> <a href="/tags/xdp/" style="font-size: 10px;">xdp</a>
     </div>
   </div>
 
