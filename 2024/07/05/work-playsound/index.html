@@ -6,15 +6,15 @@
   
   <title>Linux命令行操作蓝牙播放步骤 | Skippor&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="蓝牙播放步骤：">
+  <meta name="description" content="一. 连接蓝牙, 一般用root用户操作">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Linux命令行操作蓝牙播放步骤">
 <meta property="og:url" content="https://skippor.github.io/2024/07/05/work-playsound/index.html">
 <meta property="og:site_name" content="Skippor&#39;s Blog">
-<meta property="og:description" content="蓝牙播放步骤：">
+<meta property="og:description" content="一. 连接蓝牙, 一般用root用户操作">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-07-05T16:43:03.000Z">
-<meta property="article:modified_time" content="2024-12-12T12:43:59.315Z">
+<meta property="article:modified_time" content="2024-12-17T11:42:47.653Z">
 <meta property="article:author" content="Skippor">
 <meta property="article:tag" content="work">
 <meta name="twitter:card" content="summary">
@@ -96,17 +96,15 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <h1 id="蓝牙播放步骤："><a href="#蓝牙播放步骤：" class="headerlink" title="蓝牙播放步骤："></a>蓝牙播放步骤：</h1><h2 id="一-连接蓝牙-一般用root用户操作"><a href="#一-连接蓝牙-一般用root用户操作" class="headerlink" title="一. 连接蓝牙, 一般用root用户操作"></a>一. 连接蓝牙, 一般用root用户操作</h2><ol>
-<li>hciconfig hci0 up</li>
-<li>bluetoothd服务已起来</li>
-<li>bluetoothctl 命令进去操作<br>[JBL Flip 5]# connect D8:37:3B:6B:45:D6  我的音箱<br>pair D8:37:3B:6B:45:D6<br>connect D8:37:3B:6B:45:D6</li>
-</ol>
+        <!-- # 蓝牙播放步骤：-->
+
+<h2 id="一-连接蓝牙-一般用root用户操作"><a href="#一-连接蓝牙-一般用root用户操作" class="headerlink" title="一. 连接蓝牙, 一般用root用户操作"></a>一. 连接蓝牙, 一般用root用户操作</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">1. hciconfig hci0 up</span><br><span class="line">2. bluetoothd服务已起来</span><br><span class="line">3. bluetoothctl 命令进去操作</span><br><span class="line">[JBL Flip 5]# connect D8:37:3B:6B:45:D6  我的音箱</span><br><span class="line">pair D8:37:3B:6B:45:D6</span><br><span class="line">connect D8:37:3B:6B:45:D6</span><br></pre></td></tr></table></figure>
 <p>接下来两大步骤换成非root用户操作，（root操作一直起不来）</p>
 <h2 id="二-设置声卡声道"><a href="#二-设置声卡声道" class="headerlink" title="二. 设置声卡声道"></a>二. 设置声卡声道</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1. pulseaudio --start</span><br><span class="line">2. pacmd list-cards</span><br><span class="line">   pacmd set-card-profile 3 a2dp_sink</span><br><span class="line">3. pacmd list-sinks</span><br><span class="line">   pacmd set-default-sink 3</span><br></pre></td></tr></table></figure>
 
 <h2 id="三-播放音乐"><a href="#三-播放音乐" class="headerlink" title="三. 播放音乐"></a>三. 播放音乐</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">play /home/dtt/bluetooth/xajh.mp3</span><br></pre></td></tr></table></figure>
 
-<h2 id="四-总结，在orangepi上只需执行"><a href="#四-总结，在orangepi上只需执行" class="headerlink" title="四. 总结，在orangepi上只需执行"></a>四. 总结，在orangepi上只需执行</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">bluetoothctl connect D8:37:3B:6B:45:D6</span><br><span class="line"></span><br><span class="line">pulseaudio --start</span><br><span class="line">pacmd set-card-profile 3 a2dp_sink</span><br><span class="line">pacmd set-default-sink 3</span><br><span class="line"></span><br><span class="line">play /home/dtt/bluetooth/xajh.mp3</span><br></pre></td></tr></table></figure>
+<h2 id="四-总结，在orangepi上只需执行"><a href="#四-总结，在orangepi上只需执行" class="headerlink" title="四. 总结，在orangepi上只需执行"></a>四. 总结，在orangepi上只需执行</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">bluetoothctl connect D8:37:3B:6B:45:D6</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">pulseaudio --start</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">pacmd set-card-profile 3 a2dp_sink</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">pacmd set-default-sink 3</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">play /home/dtt/bluetooth/xajh.mp3</span></span><br></pre></td></tr></table></figure>
 
       
     </div>

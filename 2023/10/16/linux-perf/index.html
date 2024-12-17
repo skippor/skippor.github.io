@@ -6,16 +6,16 @@
   
   <title>Linux之perf性能分析 | Skippor&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="Linux之perf性能分析">
+  <meta name="description" content="工具安装">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Linux之perf性能分析">
 <meta property="og:url" content="https://skippor.github.io/2023/10/16/linux-perf/index.html">
 <meta property="og:site_name" content="Skippor&#39;s Blog">
-<meta property="og:description" content="Linux之perf性能分析">
+<meta property="og:description" content="工具安装">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://skippor.github.io/images/perf-tools.png">
 <meta property="article:published_time" content="2023-10-16T16:12:03.000Z">
-<meta property="article:modified_time" content="2024-12-17T06:03:16.548Z">
+<meta property="article:modified_time" content="2024-12-17T11:35:40.393Z">
 <meta property="article:author" content="Skippor">
 <meta property="article:tag" content="linux">
 <meta property="article:tag" content="performance">
@@ -100,7 +100,9 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <h1 id="Linux之perf性能分析"><a href="#Linux之perf性能分析" class="headerlink" title="Linux之perf性能分析"></a>Linux之perf性能分析</h1><h2 id="工具安装"><a href="#工具安装" class="headerlink" title="工具安装"></a>工具安装</h2><h4 id="1-ubuntu下安装"><a href="#1-ubuntu下安装" class="headerlink" title="1. ubuntu下安装"></a>1. ubuntu下安装</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">安装perf工具，执行如下命令：</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo apt-get update</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo apt-get upgrade</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo apt-get autoremove</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo apt-get install linux-tools-common linux-tools-$(<span class="built_in">uname</span> -r)</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">查看perf工具的版本，执行如下命令：</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">perf --version</span></span><br></pre></td></tr></table></figure>
+        <!-- # Linux之perf性能分析 -->
+
+<h2 id="工具安装"><a href="#工具安装" class="headerlink" title="工具安装"></a>工具安装</h2><h4 id="1-ubuntu下安装"><a href="#1-ubuntu下安装" class="headerlink" title="1. ubuntu下安装"></a>1. ubuntu下安装</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">安装perf工具，执行如下命令：</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo apt-get update</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo apt-get upgrade</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo apt-get autoremove</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo apt-get install linux-tools-common linux-tools-$(<span class="built_in">uname</span> -r)</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">查看perf工具的版本，执行如下命令：</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">perf --version</span></span><br></pre></td></tr></table></figure>
 
 <h4 id="2-源码编译"><a href="#2-源码编译" class="headerlink" title="2. 源码编译"></a>2. 源码编译</h4><ul>
 <li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/vivian187/p/17266181.html">性能测试工具perf安装与使用</a></li>
@@ -279,7 +281,7 @@
       <strong class="article-nav-caption">前一篇</strong>
       <div class="article-nav-title">
         
-          Linux内核之EBPF测试
+          Linux内核之EBPF测试指南
         
       </div>
     </a>

@@ -4,19 +4,19 @@
   <meta charset="utf-8">
   
   
-  <title>Linux内核之XDP解析 | Skippor&#39;s Blog</title>
+  <title>Linux内核之XDP指南 | Skippor&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="Linux内核之XDP说明">
+  <meta name="description" content="XDP的系统架构">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Linux内核之XDP解析">
+<meta property="og:title" content="Linux内核之XDP指南">
 <meta property="og:url" content="https://skippor.github.io/2023/11/21/linux-xdp/index.html">
 <meta property="og:site_name" content="Skippor&#39;s Blog">
-<meta property="og:description" content="Linux内核之XDP说明">
+<meta property="og:description" content="XDP的系统架构">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://skippor.github.io/images/xdp-arch.png">
 <meta property="og:image" content="https://skippor.github.io/images/xdp-generic.png">
 <meta property="article:published_time" content="2023-11-21T16:12:03.000Z">
-<meta property="article:modified_time" content="2024-12-17T06:28:01.029Z">
+<meta property="article:modified_time" content="2024-12-17T11:36:22.445Z">
 <meta property="article:author" content="Skippor">
 <meta property="article:tag" content="linux">
 <meta property="article:tag" content="kernel">
@@ -94,7 +94,7 @@
         
   
     <h1 class="p-name article-title" itemprop="headline name">
-      Linux内核之XDP解析
+      Linux内核之XDP指南
     </h1>
   
 
@@ -102,16 +102,15 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <h1 id="Linux内核之XDP说明"><a href="#Linux内核之XDP说明" class="headerlink" title="Linux内核之XDP说明"></a>Linux内核之XDP说明</h1><h2 id="XDP的系统架构"><a href="#XDP的系统架构" class="headerlink" title="XDP的系统架构"></a>XDP的系统架构</h2><p><img src="/images/xdp-arch.png" alt=" XDP 与 Linux 网络栈的集成"></p>
+        <!-- # Linux内核之XDP说明 -->
+
+<h2 id="XDP的系统架构"><a href="#XDP的系统架构" class="headerlink" title="XDP的系统架构"></a>XDP的系统架构</h2><p><img src="/images/xdp-arch.png" alt=" XDP 与 Linux 网络栈的集成"></p>
 <h2 id="XDP的工作位置"><a href="#XDP的工作位置" class="headerlink" title="XDP的工作位置"></a>XDP的工作位置</h2><p><img src="/images/xdp-generic.png" alt="XDP程序的运行位置"></p>
 <h2 id="XDP的工作模式"><a href="#XDP的工作模式" class="headerlink" title="XDP的工作模式"></a>XDP的工作模式</h2><p>XDP 总共支持三种工作模式（operation mode）</p>
 <ul>
-<li><p>xdpdrv: xdpdrv 表示 native XDP（原生 XDP）, 意味着 BPF 程序直接在驱动的接收路 径上运行，理论上这是软件层最早可以处理包的位置（the earliest possible point）。这是常规&#x2F;传统的 XDP 模式，需要驱动实现对 XDP 的支持，目前 Linux 内核中主流的 10G&#x2F;40G 网卡都已经支持。</p>
-</li>
-<li><p>xdpgeneric: xdpgeneric 表示 generic XDP（通用 XDP），用于给那些还没有原生支持 XDP 的驱动进行试验性测试。generic XDP hook 位于内核协议栈的主接收路径（main receive path）上，接受的是 skb 格式的包，但由于 这些 hook 位于 ingress 路 径的很后面（a much later point），因此与 native XDP 相比性能有明显下降。因 此，xdpgeneric 大部分情况下只能用于试验目的，很少用于生产环境。</p>
-</li>
-<li><p>xdpoffload: 一些智能网卡（例如支持 Netronome’s nfp 驱动的网卡）实现了 xdpoffload 模式 ，允许将整个 BPF&#x2F;XDP 程序 offload 到硬件，因此程序在网卡收到包时就直接在网卡进行处理。这提供了比native XDP 更高的性能，虽然在这种模式中某些 BPF map 类型和BPF 辅助函数是不能用的。BPF 校验器检测到这种情况时会直接报错，告诉用户哪些东西是不支持的。除了这些不支持的 BPF 特性之外，其他方面与 native XDP 都是一样的。</p>
-</li>
+<li>xdpdrv: xdpdrv 表示 native XDP（原生 XDP）, 意味着 BPF 程序直接在驱动的接收路 径上运行，理论上这是软件层最早可以处理包的位置（the earliest possible point）。这是常规&#x2F;传统的 XDP 模式，需要驱动实现对 XDP 的支持，目前 Linux 内核中主流的 10G&#x2F;40G 网卡都已经支持。</li>
+<li>xdpgeneric: xdpgeneric 表示 generic XDP（通用 XDP），用于给那些还没有原生支持 XDP 的驱动进行试验性测试。generic XDP hook 位于内核协议栈的主接收路径（main receive path）上，接受的是 skb 格式的包，但由于 这些 hook 位于 ingress 路 径的很后面（a much later point），因此与 native XDP 相比性能有明显下降。因 此，xdpgeneric 大部分情况下只能用于试验目的，很少用于生产环境。</li>
+<li>xdpoffload: 一些智能网卡（例如支持 Netronome’s nfp 驱动的网卡）实现了 xdpoffload 模式 ，允许将整个 BPF&#x2F;XDP 程序 offload 到硬件，因此程序在网卡收到包时就直接在网卡进行处理。这提供了比native XDP 更高的性能，虽然在这种模式中某些 BPF map 类型和BPF 辅助函数是不能用的。BPF 校验器检测到这种情况时会直接报错，告诉用户哪些东西是不支持的。除了这些不支持的 BPF 特性之外，其他方面与 native XDP 都是一样的。</li>
 </ul>
 <h2 id="XDP程序的返回码"><a href="#XDP程序的返回码" class="headerlink" title="XDP程序的返回码"></a>XDP程序的返回码</h2><p>XDP程序执行结束后会返回一个结果，告诉调用者接下来如何处理这个包：</p>
 <ul>
@@ -162,7 +161,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://skippor.github.io/2023/11/21/linux-xdp/" data-id="cm384jtdr000ssb78acxw3a1u" data-title="Linux内核之XDP解析" class="article-share-link">分享</a>
+      <a data-url="https://skippor.github.io/2023/11/21/linux-xdp/" data-id="cm384jtdr000ssb78acxw3a1u" data-title="Linux内核之XDP指南" class="article-share-link">分享</a>
       
       
       

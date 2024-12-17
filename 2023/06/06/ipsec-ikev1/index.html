@@ -6,15 +6,15 @@
   
   <title>IPSec之IKEV1协商过程解析 | Skippor&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="IPSec之IKEV1协商过程解析">
+  <meta name="description" content="IKEv1协商流程">
 <meta property="og:type" content="article">
 <meta property="og:title" content="IPSec之IKEV1协商过程解析">
 <meta property="og:url" content="https://skippor.github.io/2023/06/06/ipsec-ikev1/index.html">
 <meta property="og:site_name" content="Skippor&#39;s Blog">
-<meta property="og:description" content="IPSec之IKEV1协商过程解析">
+<meta property="og:description" content="IKEv1协商流程">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-06-06T16:36:03.000Z">
-<meta property="article:modified_time" content="2024-12-17T07:26:40.697Z">
+<meta property="article:modified_time" content="2024-12-17T11:32:46.913Z">
 <meta property="article:author" content="Skippor">
 <meta property="article:tag" content="ipsec">
 <meta property="article:tag" content="ikev1">
@@ -98,7 +98,9 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <h1 id="IPSec之IKEV1协商过程解析"><a href="#IPSec之IKEV1协商过程解析" class="headerlink" title="IPSec之IKEV1协商过程解析"></a>IPSec之IKEV1协商过程解析</h1><h2 id="IKEv1协商流程"><a href="#IKEv1协商流程" class="headerlink" title="IKEv1协商流程"></a>IKEv1协商流程</h2><h3 id="IKEv1两阶段协商"><a href="#IKEv1两阶段协商" class="headerlink" title="IKEv1两阶段协商"></a>IKEv1两阶段协商</h3><ul>
+        <!-- # IPSec之IKEV1协商过程解析 -->
+
+<h2 id="IKEv1协商流程"><a href="#IKEv1协商流程" class="headerlink" title="IKEv1协商流程"></a>IKEv1协商流程</h2><h3 id="IKEv1两阶段协商"><a href="#IKEv1两阶段协商" class="headerlink" title="IKEv1两阶段协商"></a>IKEv1两阶段协商</h3><ul>
 <li><p>第1阶段：两个ISAKMP对等体建立经过身份验证的安全隧道，保护ISAKMP协商消息。此隧道称为ISAKMP SA。ISAKMP定义了两种模式：主模式(MM)和野蛮模式。</p>
 <ul>
 <li>1.1 主模式：发起方向响应方发送建议或建议时，IKE会话开始。节点间的第一次交换建立基本的安全策略；发起方提出加密和认证算法供使用。响应方选择适当的建议书（假设已选择建议书）并将其发送给发起方。下一个交换传递Diffie-Hellman公钥和其他数据。所有进一步协商在IKE SA内加密。第三个交换机会验证ISAKMP会话。一旦建立IKE SA，IPSec协商（快速模式）就会开始。</li>

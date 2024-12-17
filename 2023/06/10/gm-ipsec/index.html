@@ -6,15 +6,15 @@
   
   <title>国密IPSec之V1.1协商过程 | Skippor&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="国密IPSec之V1.1协商过程">
+  <meta name="description" content="密码算法和密钥种类">
 <meta property="og:type" content="article">
 <meta property="og:title" content="国密IPSec之V1.1协商过程">
 <meta property="og:url" content="https://skippor.github.io/2023/06/10/gm-ipsec/index.html">
 <meta property="og:site_name" content="Skippor&#39;s Blog">
-<meta property="og:description" content="国密IPSec之V1.1协商过程">
+<meta property="og:description" content="密码算法和密钥种类">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-06-10T16:36:03.000Z">
-<meta property="article:modified_time" content="2024-12-17T09:21:13.437Z">
+<meta property="article:modified_time" content="2024-12-17T11:33:13.997Z">
 <meta property="article:author" content="Skippor">
 <meta property="article:tag" content="ipsec">
 <meta property="article:tag" content="ikev1">
@@ -99,7 +99,9 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <h1 id="国密IPSec之V1-1协商过程"><a href="#国密IPSec之V1-1协商过程" class="headerlink" title="国密IPSec之V1.1协商过程"></a>国密IPSec之V1.1协商过程</h1><h2 id="密码算法和密钥种类"><a href="#密码算法和密钥种类" class="headerlink" title="密码算法和密钥种类"></a>密码算法和密钥种类</h2><h3 id="密码算法"><a href="#密码算法" class="headerlink" title="密码算法"></a>密码算法</h3><p>IPSec VPN使用国家密码管理局批准的非对称密码算法、对称密码算法、密码杂凑算法和随机数生成算法。算法及使用方法如下：</p>
+        <!-- # 国密IPSec之V1.1协商过程 -->
+
+<h2 id="密码算法和密钥种类"><a href="#密码算法和密钥种类" class="headerlink" title="密码算法和密钥种类"></a>密码算法和密钥种类</h2><h3 id="密码算法"><a href="#密码算法" class="headerlink" title="密码算法"></a>密码算法</h3><p>IPSec VPN使用国家密码管理局批准的非对称密码算法、对称密码算法、密码杂凑算法和随机数生成算法。算法及使用方法如下：</p>
 <ul>
 <li>非对称密码算法使用 1024 比特 RSA 算法或 256 比特 SM2 椭圆曲线密码算法，用于<br>实体验证、数字签名和数字信封等。</li>
 <li>对称密码算法使用 128 比特分组的 SM1 分组密码算法，用于密钥协商数据的加密保<br>护和报文数据的加密保护。算法的工作模式使用 CBC 模式。</li>
@@ -112,73 +114,60 @@
 <li>工作密钥：在密钥协商第一阶段得到的密钥，用于会话密钥协商过程的保护。</li>
 <li>会话密钥：在密钥协商第二阶段得到的密钥，用于数据报文的加密和完整性保护。</li>
 </ul>
-<h2 id="IKEv1-1协商流程"><a href="#IKEv1-1协商流程" class="headerlink" title="IKEv1.1协商流程"></a>IKEv1.1协商流程</h2><h3 id="第一阶段-主模式"><a href="#第一阶段-主模式" class="headerlink" title="第一阶段-主模式"></a>第一阶段-主模式</h3><p>主模式的交换过程如下</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">消息序列      发起方            方向        响应方</span><br><span class="line">  1         HDR, SA           ----&gt;</span><br><span class="line">  2                           &lt;----       HDR, SA, CERT_sig_r, CERT_enc_r</span><br><span class="line">  3         HDR, XCHi, SIGi   ----&gt;</span><br><span class="line">  4                           &lt;----       HDR, XCHr, SIGr</span><br><span class="line">  5         HDR*, HASHi       ----&gt;</span><br><span class="line">  6                           &lt;----       HDR*, HASHr</span><br></pre></td></tr></table></figure>
+<h2 id="IKEv1-1协商流程"><a href="#IKEv1-1协商流程" class="headerlink" title="IKEv1.1协商流程"></a>IKEv1.1协商流程</h2><h3 id="第一阶段-主模式"><a href="#第一阶段-主模式" class="headerlink" title="第一阶段-主模式"></a>第一阶段-主模式</h3><h4 id="主模式的交换过程如下"><a href="#主模式的交换过程如下" class="headerlink" title="主模式的交换过程如下"></a>主模式的交换过程如下</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">消息序列      发起方            方向        响应方</span><br><span class="line">  1         HDR, SA           ----&gt;</span><br><span class="line">  2                           &lt;----       HDR, SA, CERT_sig_r, CERT_enc_r</span><br><span class="line">  3         HDR, XCHi, SIGi   ----&gt;</span><br><span class="line">  4                           &lt;----       HDR, XCHr, SIGr</span><br><span class="line">  5         HDR*, HASHi       ----&gt;</span><br><span class="line">  6                           &lt;----       HDR*, HASHr</span><br></pre></td></tr></table></figure>
 <ul>
 <li>消息1 发起方向响应方发送一个封装有建议载荷的安全联盟载荷，而建议载荷中又封装有变换载荷。</li>
 <li>消息2 响应方发送一个安全联盟载荷，该载荷表明它所接受的发起方发送的SA提议。</li>
 <li>消息3和4 发起方和响应方交换数据，交换的数据内容包括nonce、身份标识（ID）、可选的证书等载荷。<ul>
-<li><p>Nonce是生成加密密钥和认证密钥所必需的参数；ID是发起方或响应方的标识。这些数据使用临时密钥Sk进行加密保护，Sk用数字信封保护，最后，双方各自对数据进行数字签名后再加密。</p>
-</li>
-<li><p>发起方交换的数据如下：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">XCHi = Asymmetric_Encrypt(Ski, pub_r) | Symmetric_Encrypt(Ni,Ski) | Symmetric_Encrypt(IDi,Ski) [ | Symmetric_Encrypt(CERT,Ski)]</span><br><span class="line">SIGi_b = Asymmetric_Sign(Hash(Ski_b | Ni_b | IDi_b [ | CERT_b ]), priv_i)</span><br></pre></td></tr></table></figure></li>
-<li><p>响应方交换的数据如下：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">XCHr = Asymmetric_Encrypt(Skr, pub_i) | Symmetric_Encrypt(Nr,Skr) |</span><br><span class="line">Symmetric_Encrypt(IDr,Skr)</span><br><span class="line">SIGr_b = Asymmetric_Sign(Hash(Skr_b | Nr_b | IDr_b), priv_r)</span><br></pre></td></tr></table></figure></li>
-<li><p>上述过程中使用的非对称密码算法、对称密码算法和密码杂凑算法均由消息1和消息2确定。</p>
-</li>
-<li><p>临时密钥Sk由发起方和响应方各自随机生成，其长度应符合对称密码算法对密钥长度的要求。</p>
-</li>
-<li><p>对称密码运算使用CBC模式，第一个载荷的IV值为0；后续的IV使用前面载荷的最后一组密文。</p>
-</li>
-<li><p>加密前的交换数据应进行填充，使其长度等于对称密码算法分组长度的整数倍。</p>
-</li>
-<li><p>所有的填充字节的值除最后一个字节外都是0，最后一个填充字节的值为不包括它自己的填充字节数。</p>
-</li>
-<li><p>当使用证书进行身份验证时，Idi和Idr的类型应使用ID_DER_ASN1_DN。</p>
-</li>
-<li><p>如果对方证书已经在撤销列表中，系统应发送INVALID_CERTIFICATE通知消息。</p>
-</li>
-<li><p>消息3和消息4交互完成后，参与通信的双方生成基本密钥参数SKEYID，以生成后续密钥SKEYID_d、SKEYID_a、SKEYID_e，计算方法分别如下：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">SKEYID = PRF(Hash(Ni_b | Nr_b), CKY-I | CKY-R)</span><br><span class="line">SKEYID_d = PRF(SKEYID, CKY-I | CKY-R | 0)</span><br><span class="line">SKEYID_a = PRF(SKEYID, SKEYID_d | CKY-I | CKY-R | 1)</span><br><span class="line">SKEYID_e = PRF(SKEYID, SKEYID_a | CKY-I | CKY-R | 2)</span><br></pre></td></tr></table></figure></li>
-<li><p>上述计算公式中的值0，1，2是单个字节的数值。</p>
-</li>
-<li><p>SKEYID_e 是ISAKMP SA用来保护其消息机密性所使用的工作密钥。SKEYID_a 是ISAKMPSA用来验证其消息完整性以及数据源身份所使用的工作密钥。SKEYID_d 用于会话密钥的产生。</p>
-</li>
-<li><p>所有SKEYID的长度都由PRF函数的输出长度决定。如果PRF函数的输出长度太短，不能作为一个密钥来使用，则SKEYID_e应进行扩展。例如，HMAC hash的一个PRF可产生128比特的输出，但密码算法要求用到320比特的密钥。那么，SKEYID_e就需要利用反馈及连接方法加以扩展，直到满足对密钥长度的要求为止。反馈及连接方法如下：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">K = K1 | K2 | K3…</span><br><span class="line">K1 = PRF(SKEYID_e, 0)</span><br><span class="line">K2 = PRF(SKEYID_e, K1)</span><br><span class="line">K3 = PRF(SKEYID_e, K2)</span><br></pre></td></tr></table></figure></li>
-<li><p>最后从K的起始位置开始取密码算法的密钥所需要的位数。</p>
-</li>
+<li>Nonce是生成加密密钥和认证密钥所必需的参数；ID是发起方或响应方的标识。这些数据使用临时密钥Sk进行加密保护，Sk用数字信封保护，最后，双方各自对数据进行数字签名后再加密。</li>
+<li>发起方交换的数据如下：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">XCHi = Asymmetric_Encrypt(Ski, pub_r) | Symmetric_Encrypt(Ni,Ski) | Symmetric_Encrypt(IDiSki) | CERT_sig_i | CERT_enc_i</span><br><span class="line">SIGi_b = Asymmetric_Sign(Ski_b | Ni_b | IDi_b | CERT_enc_i_b, priv_i)</span><br></pre></td></tr></table></figure></li>
+<li>响应方交换的数据如下：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">XCHr = Asymmetric_Encrypt(Skr, pub_i) | Symmetric_Encrypt(Nr,Skr) |</span><br><span class="line">Symmetric_Encrypt(IDr,Skr)</span><br><span class="line">SIGr_b = Asymmetric_Sign(Skr_b | Nr_b | IDr_b | CERT_enc_r_b, priv_r)</span><br></pre></td></tr></table></figure></li>
+<li>上述过程中使用的非对称密码算法、对称密码算法和密码杂凑算法均由消息1和消息2确定。</li>
+<li>临时密钥Sk由发起方和响应方各自随机生成，其长度应符合对称密码算法对密钥长度的要求。</li>
+<li>对称密码运算使用CBC模式，第一个载荷的IV值为0；后续的IV使用前面载荷的最后一组密文。</li>
+<li>加密前的交换数据应进行填充，使其长度等于对称密码算法分组长度的整数倍。</li>
+<li>所有的填充字节的值除最后一个字节外都是0，最后一个填充字节的值为不包括它自己的填充字节数。</li>
+<li>当使用证书进行身份验证时，Idi和Idr的类型应使用ID_DER_ASN1_DN。</li>
+<li>如果对方证书已经在撤销列表中，系统应发送INVALID_CERTIFICATE通知消息。</li>
+<li>消息3和消息4交互完成后，参与通信的双方生成基本密钥参数SKEYID，以生成后续密钥SKEYID_d、SKEYID_a、SKEYID_e，计算方法分别如下：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">SKEYID = PRF(Hash(Ni_b | Nr_b), CKY-I | CKY-R)</span><br><span class="line">SKEYID_d = PRF(SKEYID, CKY-I | CKY-R | 0)</span><br><span class="line">SKEYID_a = PRF(SKEYID, SKEYID_d | CKY-I | CKY-R | 1)</span><br><span class="line">SKEYID_e = PRF(SKEYID, SKEYID_a | CKY-I | CKY-R | 2)</span><br></pre></td></tr></table></figure></li>
+<li>上述计算公式中的值0，1，2是单个字节的数值。</li>
+<li>SKEYID_e 是ISAKMP SA用来保护其消息机密性所使用的工作密钥。SKEYID_a 是ISAKMPSA用来验证其消息完整性以及数据源身份所使用的工作密钥。SKEYID_d 用于会话密钥的产生。</li>
+<li>所有SKEYID的长度都由PRF函数的输出长度决定。如果PRF函数的输出长度太短，不能作为一个密钥来使用，则SKEYID_e应进行扩展。例如，HMAC hash的一个PRF可产生128比特的输出，但密码算法要求用到320比特的密钥。那么，SKEYID_e就需要利用反馈及连接方法加以扩展，直到满足对密钥长度的要求为止。反馈及连接方法如下：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">K = K1 | K2 | K3 | ...</span><br><span class="line">K1 = PRF(SKEYID_e, 0)</span><br><span class="line">K2 = PRF(SKEYID_e, K1)</span><br><span class="line">K3 = PRF(SKEYID_e, K2)</span><br><span class="line">...</span><br></pre></td></tr></table></figure></li>
+<li>最后从K的起始位置开始取密码算法的密钥所需要的位数。</li>
 </ul>
 </li>
-<li>消息5和6发起方和响应方认证前面的交换过程。这两个消息中传递的信息使用对称密码算法加密。对称密码算法由消息1和消息2确定，密钥使用SKEYID_e。对称密码运算使用CBC模式，初始化向量IV是消息3中的Ski和消息4中的Skr串连起来经过hash运算得到的，即：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">IV= Hash(Ski | Skr)</span><br></pre></td></tr></table></figure>
-<ul>
+<li>消息5和6发起方和响应方认证前面的交换过程。这两个消息中传递的信息使用对称密码算法加密。<ul>
+<li>对称密码算法由消息1和消息2确定，密钥使用SKEYID_e。</li>
+<li>对称密码运算使用CBC模式，初始化向量IV是消息3中的Ski和消息4中的Skr串连起来经过hash运算得到的，即：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">IV= Hash(Ski | Skr)</span><br></pre></td></tr></table></figure></li>
 <li>Hash算法由消息1和消息2确定。</li>
 <li>加密前的消息应进行填充，使其长度等于对称密码算法分组长度的整数倍。所有的填充字节的值都是0。报头中的消息长度应包括填充字节的长度，因为这反映了密文的长度。</li>
-<li>为了认证交换，发起方产生HASH_I，响应方产生HASH_R，计算公式如下：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">HASH_I = PRF(SKEYID, CKY-I | CKY-R | SAi_b | IDi_b )</span><br><span class="line">HASH_R = PRF(SKEYID, CKY-R | CKY-I | SAi_b | IDr_b )</span><br></pre></td></tr></table></figure></li>
+<li>为了认证交换，发起方产生HASH_I，响应方产生HASH_R，计算公式如下：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">HASH_I = PRF(SKEYID, CKY-I | CKY-R | SAi_b | IDi_b )</span><br><span class="line">HASH_R = PRF(SKEYID, CKY-R | CKY-I | SAr_b | IDr_b )</span><br></pre></td></tr></table></figure></li>
 </ul>
 </li>
 </ul>
-<h3 id="第一阶段-主模式-1"><a href="#第一阶段-主模式-1" class="headerlink" title="第一阶段-主模式"></a>第一阶段-主模式</h3><p>快速模式的交换过程如下:</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">消息序列      发起方                方向        响应方</span><br><span class="line">  1       HDR*, HASH(1), SA, Ni</span><br><span class="line">              [, IDci, IDcr ]     ----&gt;</span><br><span class="line">  2                               &lt;----     HDR*, HASH(2), SA, Nr</span><br><span class="line">                                              [, IDci, IDcr ]</span><br><span class="line">  3       HDR*, HASH(3)           ----&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="第二阶段-快速模式"><a href="#第二阶段-快速模式" class="headerlink" title="第二阶段-快速模式"></a>第二阶段-快速模式</h3><p>快速模式交换依赖于第一阶段主模式交换，作为IPSec SA协商过程的一部分协商IPSecSA的安全策略并衍生会话密钥。快速模式交换的信息由ISAKMP SA来保护，即除了ISAKMP头外所有的载荷都要加密。在快速模式中，一个HASH载荷应紧跟在ISAKMP头之后，这个HASH用于消息的完整性校验以及数据源身份验证。</p>
+<ul>
+<li>在第二阶段，载荷的加密使用对称密码算法的CBC工作模式，第1个消息的IV是第一阶段的最后一组密文和第二阶段的MsgID进行hash运算所得到的，即：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">IV= Hash(第一阶段的最后一组密文 | MsgID)</span><br></pre></td></tr></table></figure>
+后续的IV是前一个消息的最后一组密文。消息的填充和第一阶段中的填充方式一样。</li>
+<li>在ISAKMP头中的MsgID唯一标识了一个正在进行中的快速模式，而该ISAKMP SA本身又由ISAKMP头中的cookies来标识。因为快速模式的每个实例使用一个唯一的IV，这就有可能基于一个ISAKMP SA的多个快速模式在任一时间内同时进行。</li>
+<li>在快速模式协商中，身份标识ID缺省定义为ISAKMP双方的IP地址，并且没有强制规定允许的协议或端口号。如果协商双方需要指定ID，则双方的身份应作为IDi和IDr被依次传递。响应方的本地安全策略将决定是否接受对方的身份标识ID。如果发起方的身份标识ID由于安全策略或其它原因没有被响应方所接受，则响应方应该发送一个通知消息类型为INVALID_ID_INFORMATION (18)的通知载荷。</li>
+<li>在通信双方之间有多条隧道同时存在的情况下，身份标识ID为对应的IPSec SA标识并规定通信数据流进入对应的隧道。</li>
+</ul>
+<h4 id="快速模式的交换过程如下"><a href="#快速模式的交换过程如下" class="headerlink" title="快速模式的交换过程如下:"></a>快速模式的交换过程如下:</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">消息序列      发起方                                  方向        响应方</span><br><span class="line">  1       HDR*, HASH(1), SA, Ni [, IDci, IDcr ]     ----&gt;</span><br><span class="line">  2                                                 &lt;----     HDR*, HASH(2), SA, Nr [, IDci, IDcr ]</span><br><span class="line">  3       HDR*, HASH(3)                             ----&gt;</span><br></pre></td></tr></table></figure>
 <ul>
 <li>消息1 发起方向响应方发送一个杂凑载荷、一个安全联盟载荷（其中封装了一个或多个建议载荷，而每个建议载荷中又封装一个或多个变换载荷）、一个nonce载荷和标识载荷。<ul>
-<li>杂凑载荷中消息摘要的计算方法如下：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HASH(1) = PRF(SKEYID_a，MsgID | SA | Ni [ | IDi | IDr])</span><br></pre></td></tr></table></figure></li>
+<li>杂凑载荷中消息摘要的计算方法如下：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HASH(1) = PRF(SKEYID_a, MsgID | Ni_b | SA [ | IDi | IDr])</span><br></pre></td></tr></table></figure></li>
 </ul>
 </li>
 <li>消息2 响应方向发起方发送一个杂凑载荷、一个安全联盟载荷、一个nonce载荷和标识载荷。<ul>
-<li>杂凑载荷中消息摘要的计算方法如下：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HASH(2) = PRF(SKEYID_a，MsgID | Ni |SA | Nr [ | IDi | IDr])</span><br></pre></td></tr></table></figure></li>
+<li>杂凑载荷中消息摘要的计算方法如下：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HASH(2) = PRF(SKEYID_a, MsgID | Ni_b | SA | Nr_b [ | IDi | IDr])</span><br></pre></td></tr></table></figure></li>
 </ul>
 </li>
 <li>消息3 发起方向响应方发送一个杂凑载荷，用于对前面的交换进行认证。<ul>
-<li>杂凑载荷中消息摘要的计算方法如下：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HASH(3) = PRF(SKEYID_a，0 | MsgID | Ni | Nr)</span><br></pre></td></tr></table></figure></li>
-</ul>
-</li>
-<li>最后，会话密钥素材定义为：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">KEYMAT = PRF(SKEYID_d, protocol | SPI | Ni_b | Nr_b)</span><br></pre></td></tr></table></figure>
-<ul>
-<li><p>其中，protocol和SPI从协商得到的ISAKMP建议载荷中选取。用于加密的会话密钥和用于完整性校验的会话密钥按照算法要求的长度从KEYMAT中依次选取。先选取用于加密的会话密钥，后选取用于完整性校验的会话密钥。</p>
-</li>
-<li><p>当PRF函数的输出长度小于KEYMAT需要的密钥素材长度时，需要利用反馈及连接方法加以扩展，直到满足对密钥长度的要求为止。即：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">KEYMAT = K1 | K2 | K3 | ...</span><br><span class="line">其中：</span><br><span class="line">K1 = PRF(SKEYID_d, protocol | SPI | Ni_b | Nr_b)</span><br><span class="line">K2 = PRF(SKEYID_d, K1 | protocol | SPI | Ni_b | Nr_b)</span><br><span class="line">K3 = PRF(SKEYID_d, K2 | protocol | SPI | Ni_b | Nr_b)</span><br></pre></td></tr></table></figure></li>
+<li>杂凑载荷中消息摘要的计算方法如下：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HASH(3) = PRF(SKEYID_a, 0 | MsgID | Ni_b | Nr_b)</span><br></pre></td></tr></table></figure></li>
+<li>最后，会话密钥素材定义为：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">KEYMAT = PRF(SKEYID_d, protocol | SPI | Ni_b | Nr_b)</span><br></pre></td></tr></table></figure></li>
+<li>其中，protocol和SPI从协商得到的ISAKMP建议载荷中选取。用于加密的会话密钥和用于完整性校验的会话密钥按照算法要求的长度从KEYMAT中依次选取。先选取用于加密的会话密钥，后选取用于完整性校验的会话密钥。</li>
+<li>当PRF函数的输出长度小于KEYMAT需要的密钥素材长度时，需要利用反馈及连接方法加以扩展，直到满足对密钥长度的要求为止。即：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">KEYMAT = K1 | K2 | K3 | ...</span><br><span class="line">其中：</span><br><span class="line">K1 = PRF(SKEYID_d, protocol | SPI | Ni_b | Nr_b)</span><br><span class="line">K2 = PRF(SKEYID_d, K1 | protocol | SPI | Ni_b | Nr_b)</span><br><span class="line">K3 = PRF(SKEYID_d, K2 | protocol | SPI | Ni_b | Nr_b)</span><br><span class="line">...</span><br></pre></td></tr></table></figure></li>
 </ul>
 </li>
 <li>单个SA协商产生两个安全联盟—— 一个入，一个出。每个SA（一个由发起方选择，另一个由响应方选择）的不同的SPI保证了每个方向都有一个不同的KEYMAT。由SA的目的地选择的SPI，被用于衍生该SA的KEYMAT。</li>
@@ -189,8 +178,7 @@
 <li>其中N&#x2F;D是一个ISAKMP通知载荷，或是一个ISAKMP删除载荷。HASH(1)的计算方法为：<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HASH(1) = PRF(SKEYID_a, MsgID | N/D)</span><br></pre></td></tr></table></figure></li>
 <li>其中，MsgID不能与同一个ISAKMP SA保护的其他第二阶段交换的MsgID相同。</li>
 </ul>
-<p>这个消息的加密使用对称密码算法的CBC工作模式，其密钥使用SKEYID_e，初始化向量IV是第一阶段的最后一组密文和MsgID进行hash运算所得到的，即：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">IV= Hash(第一阶段的最后一组密文 | MsgID)</span><br></pre></td></tr></table></figure>
+<p>这个消息的加密使用对称密码算法的CBC工作模式，其密钥使用SKEYID_e，初始化向量IV是第一阶段的最后一组密文和MsgID进行hash运算所得到的，即：<br>  <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">IV= Hash(第一阶段的最后一组密文 | MsgID)</span><br></pre></td></tr></table></figure></p>
 <ul>
 <li>消息的填充和第一阶段中的填充方式一样。</li>
 </ul>
@@ -203,7 +191,7 @@
 <ul>
 <li>#标志说明如果NAT存在，这些包将被发送到修改后的端口。</li>
 <li>如果需要，NAT_OA载荷分别添加在第二阶段交换过程中消息1和消息2的载荷之后，同第二阶段的消息载荷一起参与密码运算。</li>
-<li>实现 NAT穿越的处理过程和消息格式按RFC3947的规定执行。</li>
+<li>实现NAT穿越的处理过程和消息格式按RFC3947的规定执行。</li>
 </ul>
 <h2 id="strongswan国密项目"><a href="#strongswan国密项目" class="headerlink" title="strongswan国密项目"></a>strongswan国密项目</h2><ul>
 <li><a target="_blank" rel="noopener" href="https://github.com/zhangke5959/strongswan">strongswan</a></li>
