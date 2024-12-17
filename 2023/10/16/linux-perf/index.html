@@ -4,20 +4,21 @@
   <meta charset="utf-8">
   
   
-  <title>Linux内核之性能分析 | Skippor&#39;s Blog</title>
+  <title>Linux之perf性能分析 | Skippor&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="description" content="准备">
+  <meta name="description" content="Linux之perf性能分析">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Linux内核之性能分析">
+<meta property="og:title" content="Linux之perf性能分析">
 <meta property="og:url" content="https://skippor.github.io/2023/10/16/linux-perf/index.html">
 <meta property="og:site_name" content="Skippor&#39;s Blog">
-<meta property="og:description" content="准备">
+<meta property="og:description" content="Linux之perf性能分析">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-10-16T16:12:03.000Z">
-<meta property="article:modified_time" content="2024-12-12T12:35:29.147Z">
+<meta property="article:modified_time" content="2024-12-17T02:42:15.868Z">
 <meta property="article:author" content="Skippor">
 <meta property="article:tag" content="linux">
 <meta property="article:tag" content="kernel">
+<meta property="article:tag" content="perf">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternate" href="/atom.xml" title="Skippor's Blog" type="application/atom+xml">
@@ -89,7 +90,7 @@
         
   
     <h1 class="p-name article-title" itemprop="headline name">
-      Linux内核之性能分析
+      Linux之perf性能分析
     </h1>
   
 
@@ -97,17 +98,173 @@
     
     <div class="e-content article-entry" itemprop="articleBody">
       
-        <h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><h2 id="操作"><a href="#操作" class="headerlink" title="操作"></a>操作</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">perf graph</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">调试技巧：</span><br><span class="line">perf top -C  1 --call-graph caller---》 看调用逻辑</span><br><span class="line">perf top -C  1 --call-graph callee---》 被谁调用。</span><br></pre></td></tr></table></figure>
+        <h1 id="Linux之perf性能分析"><a href="#Linux之perf性能分析" class="headerlink" title="Linux之perf性能分析"></a>Linux之perf性能分析</h1><h2 id="工具安装"><a href="#工具安装" class="headerlink" title="工具安装"></a>工具安装</h2><h4 id="1-ubuntu下安装"><a href="#1-ubuntu下安装" class="headerlink" title="1. ubuntu下安装"></a>1. ubuntu下安装</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">安装perf工具，执行如下命令：</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo apt-get update</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo apt-get upgrade</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo apt-get autoremove</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo apt-get install linux-tools-common linux-tools-$(<span class="built_in">uname</span> -r)</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">查看perf工具的版本，执行如下命令：</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">perf --version</span></span><br></pre></td></tr></table></figure>
 
-<h2 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h2>
+<h4 id="2-源码编译"><a href="#2-源码编译" class="headerlink" title="2. 源码编译"></a>2. 源码编译</h4><ul>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/vivian187/p/17266181.html">性能测试工具perf安装与使用</a></li>
+</ul>
+<h2 id="功能简介"><a href="#功能简介" class="headerlink" title="功能简介"></a>功能简介</h2><p>perf –help之后可以看到perf的二级命令。</p>
+<table>
+<thead>
+<tr>
+<th align="left">序号</th>
+<th align="left">命令</th>
+<th align="left">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">1</td>
+<td align="left">annotate</td>
+<td align="left">解析perf record生成的perf.data文件，显示被注释的代码。</td>
+</tr>
+<tr>
+<td align="left">2</td>
+<td align="left">archive</td>
+<td align="left">根据数据文件记录的build-id，将所有被采样到的elf文件打包。利用此压缩包，可以再任何机器上分析数据文件中记录的采样数据。</td>
+</tr>
+<tr>
+<td align="left">3</td>
+<td align="left">bench</td>
+<td align="left">perf中内置的benchmark，目前包括两套针对调度器和内存管理子系统的benchmark。</td>
+</tr>
+<tr>
+<td align="left">4</td>
+<td align="left">buildid-cache</td>
+<td align="left">管理perf的buildid缓存，每个elf文件都有一个独一无二的buildid。buildid被perf用来关联性能数据与elf文件。</td>
+</tr>
+<tr>
+<td align="left">5</td>
+<td align="left">buildid-list</td>
+<td align="left">列出数据文件中记录的所有buildid。</td>
+</tr>
+<tr>
+<td align="left">6</td>
+<td align="left">diff</td>
+<td align="left">对比两个数据文件的差异。能够给出每个符号（函数）在热点分析上的具体差异。</td>
+</tr>
+<tr>
+<td align="left">7</td>
+<td align="left">evlist</td>
+<td align="left">列出数据文件perf.data中所有性能事件。</td>
+</tr>
+<tr>
+<td align="left">8</td>
+<td align="left">inject</td>
+<td align="left">该工具读取perf record工具记录的事件流，并将其定向到标准输出。在被分析代码中的任何一点，都可以向事件流中注入其它事件。</td>
+</tr>
+<tr>
+<td align="left">9</td>
+<td align="left">kmem</td>
+<td align="left">针对内核内存（slab）子系统进行追踪测量的工具。</td>
+</tr>
+<tr>
+<td align="left">10</td>
+<td align="left">kvm</td>
+<td align="left">用来追踪测试运行在KVM虚拟机上的Guest OS。</td>
+</tr>
+<tr>
+<td align="left">11</td>
+<td align="left">list</td>
+<td align="left">列出当前系统支持的所有性能事件。包括硬件性能事件、软件性能事件以及检查点。</td>
+</tr>
+<tr>
+<td align="left">12</td>
+<td align="left">lock</td>
+<td align="left">分析内核中的锁信息，包括锁的争用情况，等待延迟等。</td>
+</tr>
+<tr>
+<td align="left">13</td>
+<td align="left">mem</td>
+<td align="left">内存存取情况。</td>
+</tr>
+<tr>
+<td align="left">14</td>
+<td align="left">record</td>
+<td align="left">收集采样信息，并将其记录在数据文件中。随后可通过其它工具对数据文件进行分析。</td>
+</tr>
+<tr>
+<td align="left">15</td>
+<td align="left">report</td>
+<td align="left">读取perf record创建的数据文件，并给出热点分析结果。</td>
+</tr>
+<tr>
+<td align="left">16</td>
+<td align="left">sched</td>
+<td align="left">针对调度器子系统的分析工具。</td>
+</tr>
+<tr>
+<td align="left">17</td>
+<td align="left">script</td>
+<td align="left">执行perl或python写的功能扩展脚本、生成脚本框架、读取数据文件中的数据信息等。</td>
+</tr>
+<tr>
+<td align="left">18</td>
+<td align="left">stat</td>
+<td align="left">执行某个命令，收集特定进程的性能概况，包括CPI、Cache丢失率等。</td>
+</tr>
+<tr>
+<td align="left">19</td>
+<td align="left">test</td>
+<td align="left">perf对当前软硬件平台进行健全性测试，可用此工具测试当前的软硬件平台是否能支持perf的所有功能。</td>
+</tr>
+<tr>
+<td align="left">20</td>
+<td align="left">timechart</td>
+<td align="left">针对测试期间系统行为进行可视化的工具。</td>
+</tr>
+<tr>
+<td align="left">21</td>
+<td align="left">top</td>
+<td align="left">类似于linux的top命令，对系统性能进行实时分析。</td>
+</tr>
+<tr>
+<td align="left">22</td>
+<td align="left">trace</td>
+<td align="left">关于syscall的工具。</td>
+</tr>
+<tr>
+<td align="left">23</td>
+<td align="left">probe</td>
+<td align="left">用于定义动态检查点。</td>
+</tr>
+</tbody></table>
+<h2 id="perf火焰图"><a href="#perf火焰图" class="headerlink" title="perf火焰图"></a>perf火焰图</h2><h3 id="项目地址"><a href="#项目地址" class="headerlink" title="项目地址"></a>项目地址</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/brendangregg/FlameGraph">Flame Graphs visualize profiled code</a></li>
+</ul>
+<h3 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h3><h4 id="1、第一步"><a href="#1、第一步" class="headerlink" title="1、第一步"></a>1、第一步</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Ctrl+c结束执行后，在当前目录下会生成采样数据perf.data.</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo perf record -g -p &lt;pid&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="2、第二步"><a href="#2、第二步" class="headerlink" title="2、第二步"></a>2、第二步</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">用perf script工具对perf.data进行解析</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">perf script -i perf.data &amp;&gt; perf.unfold</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="3、第三步"><a href="#3、第三步" class="headerlink" title="3、第三步"></a>3、第三步</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">将perf.unfold中的符号进行折叠：</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">./stackcollapse-perf.pl perf.unfold &amp;&gt; perf.folded</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="4、最后生成svg图："><a href="#4、最后生成svg图：" class="headerlink" title="4、最后生成svg图："></a>4、最后生成svg图：</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">./flamegraph.pl perf.folded &gt; perf.svg</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="5-使用浏览器打开svg"><a href="#5-使用浏览器打开svg" class="headerlink" title="5. 使用浏览器打开svg"></a>5. 使用浏览器打开svg</h4><p>火焰图解读：</p>
+<ul>
+<li>y 轴表示调用栈，每一层都是一个函数。调用栈越深，火焰就越高，顶部就是正在执行的函数，下方都是它的父函数。</li>
+<li>x 轴表示抽样数，如果一个函数在 x 轴占据的宽度越宽，就表示它被抽到的次数多，即执行的时间长。注意，x 轴不代表时间，而是所有的调用栈合并后，按字母顺序排列的。</li>
+<li>火焰图就是看顶层的哪个函数占据的宽度最大。只要有”平顶”（plateaus），就表示该函数可能存在性能问题。比如图中的longa()函数正是问题所在点。</li>
+<li>颜色没有特殊含义，因为火焰图表示的是 CPU 的繁忙程度，所以一般选择暖色调。</li>
+</ul>
+<h2 id="一些调试技巧："><a href="#一些调试技巧：" class="headerlink" title="一些调试技巧："></a>一些调试技巧：</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">此模式显示的是调用当前函数的函数（即调用者）。换句话说，它展示了哪些函数在调用特定的函数。</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">perf top -C  1 --call-graph <span class="built_in">caller</span></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">此模式显示的是被当前函数调用的函数（即被调用者）。它展示了当前函数调用了哪些其他函数。</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">perf top -C  1 --call-graph callee</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">查看线程tid失败的系统调用,如sendmsg</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">perf trace -t &lt;tid&gt; -e sendmsg --failure</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/arnoldlu/p/6241297.html">系统级性能分析工具perf的介绍与使用</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/charlieroro/p/14096252.html">提高UDP交互性能</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.brendangregg.com/perf.html">Linux Perf Examples</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.slideshare.net/slideshow/boost-udp-transaction-performance/64944843">Boost UDP Transaction Performance</a></li>
+<li><a target="_blank" rel="noopener" href="https://ntk148v.github.io/posts/linux-network-performance-ultimate-guide/">Linux Network Performance Ultimate Guide</a></li>
+<li><a target="_blank" rel="noopener" href="https://arthurchiao.art/blog/linux-trouble-shooting-cheat-sheet/">Linux Trouble Shooting Cheat Sheet</a></li>
+</ul>
+
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://skippor.github.io/2023/10/16/linux-perf/" data-id="cm384jtdp000psb783u42bf9w" data-title="Linux内核之性能分析" class="article-share-link">分享</a>
+      <a data-url="https://skippor.github.io/2023/10/16/linux-perf/" data-id="cm384jtdp000psb783u42bf9w" data-title="Linux之perf性能分析" class="article-share-link">分享</a>
       
       
       
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kernel/" rel="tag">kernel</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/" rel="tag">linux</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kernel/" rel="tag">kernel</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/" rel="tag">linux</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/perf/" rel="tag">perf</a></li></ul>
 
     </footer>
   </div>
@@ -115,11 +272,11 @@
     
 <nav id="article-nav">
   
-    <a href="/2023/11/12/linux-qemu/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2023/10/21/linux-ebpf/" id="article-nav-newer" class="article-nav-link-wrap">
       <strong class="article-nav-caption">前一篇</strong>
       <div class="article-nav-title">
         
-          Linux虚拟化之qemu的编译及使用
+          Linux内核之EBPF测试
         
       </div>
     </a>
@@ -147,7 +304,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签</h3>
     <div class="widget">
-      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/concurrency/" rel="tag">concurrency</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dpdk/" rel="tag">dpdk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gm/" rel="tag">gm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/" rel="tag">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/" rel="tag">https</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ikev1/" rel="tag">ikev1</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ikev2/" rel="tag">ikev2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ipsec/" rel="tag">ipsec</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k3s/" rel="tag">k3s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kernel/" rel="tag">kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/" rel="tag">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/" rel="tag">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/network/" rel="tag">network</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/" rel="tag">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstick/" rel="tag">openstick</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ovs/" rel="tag">ovs</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/performance/" rel="tag">performance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/qemu/" rel="tag">qemu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reprint/" rel="tag">reprint</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rust/" rel="tag">rust</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rxe/" rel="tag">rxe</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/" rel="tag">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/siw/" rel="tag">siw</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/socket/" rel="tag">socket</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/" rel="tag">ssl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/study/" rel="tag">study</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tips/" rel="tag">tips</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/" rel="tag">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wifi/" rel="tag">wifi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/" rel="tag">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/" rel="tag">work</a></li></ul>
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/concurrency/" rel="tag">concurrency</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dpdk/" rel="tag">dpdk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ebpf/" rel="tag">ebpf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/" rel="tag">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/" rel="tag">https</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ikev1/" rel="tag">ikev1</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ikev2/" rel="tag">ikev2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ipsec/" rel="tag">ipsec</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k3s/" rel="tag">k3s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kernel/" rel="tag">kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/" rel="tag">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/" rel="tag">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/network/" rel="tag">network</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/" rel="tag">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstick/" rel="tag">openstick</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ovs/" rel="tag">ovs</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perf/" rel="tag">perf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/performance/" rel="tag">performance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/qemu/" rel="tag">qemu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reprint/" rel="tag">reprint</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rust/" rel="tag">rust</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rxe/" rel="tag">rxe</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/" rel="tag">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/siw/" rel="tag">siw</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/socket/" rel="tag">socket</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/" rel="tag">ssl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/study/" rel="tag">study</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tips/" rel="tag">tips</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/" rel="tag">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wifi/" rel="tag">wifi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/" rel="tag">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/" rel="tag">work</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xdp/" rel="tag">xdp</a></li></ul>
     </div>
   </div>
 
@@ -157,7 +314,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">标签云</h3>
     <div class="widget tagcloud">
-      <a href="/tags/concurrency/" style="font-size: 10px;">concurrency</a> <a href="/tags/dpdk/" style="font-size: 11.43px;">dpdk</a> <a href="/tags/gm/" style="font-size: 11.43px;">gm</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/ikev1/" style="font-size: 12.86px;">ikev1</a> <a href="/tags/ikev2/" style="font-size: 10px;">ikev2</a> <a href="/tags/ipsec/" style="font-size: 14.29px;">ipsec</a> <a href="/tags/k3s/" style="font-size: 11.43px;">k3s</a> <a href="/tags/kernel/" style="font-size: 17.14px;">kernel</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/network/" style="font-size: 12.86px;">network</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/openstick/" style="font-size: 10px;">openstick</a> <a href="/tags/ovs/" style="font-size: 10px;">ovs</a> <a href="/tags/performance/" style="font-size: 10px;">performance</a> <a href="/tags/qemu/" style="font-size: 10px;">qemu</a> <a href="/tags/reprint/" style="font-size: 15.71px;">reprint</a> <a href="/tags/rust/" style="font-size: 10px;">rust</a> <a href="/tags/rxe/" style="font-size: 10px;">rxe</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/siw/" style="font-size: 10px;">siw</a> <a href="/tags/socket/" style="font-size: 10px;">socket</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/study/" style="font-size: 11.43px;">study</a> <a href="/tags/tips/" style="font-size: 10px;">tips</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/wifi/" style="font-size: 10px;">wifi</a> <a href="/tags/windows/" style="font-size: 11.43px;">windows</a> <a href="/tags/work/" style="font-size: 18.57px;">work</a>
+      <a href="/tags/concurrency/" style="font-size: 10px;">concurrency</a> <a href="/tags/dpdk/" style="font-size: 11.67px;">dpdk</a> <a href="/tags/ebpf/" style="font-size: 10px;">ebpf</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/ikev1/" style="font-size: 10px;">ikev1</a> <a href="/tags/ikev2/" style="font-size: 10px;">ikev2</a> <a href="/tags/ipsec/" style="font-size: 11.67px;">ipsec</a> <a href="/tags/k3s/" style="font-size: 11.67px;">k3s</a> <a href="/tags/kernel/" style="font-size: 18.33px;">kernel</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/network/" style="font-size: 13.33px;">network</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/openstick/" style="font-size: 10px;">openstick</a> <a href="/tags/ovs/" style="font-size: 10px;">ovs</a> <a href="/tags/perf/" style="font-size: 10px;">perf</a> <a href="/tags/performance/" style="font-size: 10px;">performance</a> <a href="/tags/qemu/" style="font-size: 11.67px;">qemu</a> <a href="/tags/reprint/" style="font-size: 15px;">reprint</a> <a href="/tags/rust/" style="font-size: 10px;">rust</a> <a href="/tags/rxe/" style="font-size: 10px;">rxe</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/siw/" style="font-size: 10px;">siw</a> <a href="/tags/socket/" style="font-size: 10px;">socket</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/study/" style="font-size: 11.67px;">study</a> <a href="/tags/tips/" style="font-size: 10px;">tips</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/wifi/" style="font-size: 10px;">wifi</a> <a href="/tags/windows/" style="font-size: 11.67px;">windows</a> <a href="/tags/work/" style="font-size: 16.67px;">work</a> <a href="/tags/xdp/" style="font-size: 10px;">xdp</a>
     </div>
   </div>
 
@@ -166,7 +323,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/12/">十二月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/09/">九月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/08/">八月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/07/">七月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/06/">六月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/03/">三月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/11/">十一月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/10/">十月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/09/">九月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/08/">八月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/07/">七月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/06/">六月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/04/">四月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/03/">三月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/02/">二月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/01/">一月 2023</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/12/">十二月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/09/">九月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/08/">八月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/07/">七月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/06/">六月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/05/">五月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/03/">三月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/02/">二月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/11/">十一月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/10/">十月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/09/">九月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/08/">八月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/07/">七月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/06/">六月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/04/">四月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/03/">三月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/02/">二月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/01/">一月 2023</a></li></ul>
     </div>
   </div>
 

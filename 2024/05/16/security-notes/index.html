@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>安全笔记 | Skippor&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="靶场及测试环境">
+<meta property="og:type" content="article">
+<meta property="og:title" content="安全笔记">
+<meta property="og:url" content="https://skippor.github.io/2024/05/16/security-notes/index.html">
+<meta property="og:site_name" content="Skippor&#39;s Blog">
+<meta property="og:description" content="靶场及测试环境">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-05-16T16:12:03.000Z">
+<meta property="article:modified_time" content="2024-12-17T01:39:10.312Z">
+<meta property="article:author" content="Skippor">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="kernel">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Skippor's Blog" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Skippor&#39;s Blog</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://skippor.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-security-notes" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2024/05/16/security-notes/" class="article-date">
+  <time class="dt-published" datetime="2024-05-16T16:12:03.000Z" itemprop="datePublished">2024-05-16</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      安全笔记
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="靶场及测试环境"><a href="#靶场及测试环境" class="headerlink" title="靶场及测试环境"></a>靶场及测试环境</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://www.hackthebox.com/">hackthebox</a></li>
+<li><a target="_blank" rel="noopener" href="https://tryhackme.com/">tryhackme</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/digininja/DVWA">DVWA</a></li>
+</ul>
+<h2 id="工具"><a href="#工具" class="headerlink" title="工具"></a>工具</h2><ul>
+<li><ol>
+<li>nmap: 开源的网络扫描和安全审核工具。用于发现网络上的设备、服务、操作系统、开放端口和安全漏洞。Nmap 可以用于网络安全评估、网络管理和监控。</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>ffuf: 快速的模糊测试工具。用于发现Web应用程序中的隐藏资源和漏洞。FFUF 可以通过字典攻击来测试URL、参数和HTTP头。</li>
+</ol>
+</li>
+<li><ol start="3">
+<li>ngrok: 反向代理工具。用于将本地服务器暴露到公共互联网。它可以创建一个安全的隧道，使开发者能够在本地开发时测试Webhooks和API。</li>
+</ol>
+</li>
+<li><ol start="4">
+<li>chisel: TCP&#x2F;UDP隧道工具。用于在防火墙或NAT后面进行端口转发。它可以帮助渗透测试人员在受限网络中建立连接。</li>
+</ol>
+</li>
+<li><ol start="5">
+<li>psexec.py: Python 脚本，模仿了 Sysinternals 的 PsExec 工具。用于在远程Windows主机上执行命令。它可以用于远程管理和渗透测试。</li>
+</ol>
+</li>
+<li><ol start="6">
+<li>dig: DNS查询工具。用于查询DNS记录，帮助网络管理员和安全专家进行域名解析和故障排除。</li>
+</ol>
+</li>
+<li><ol start="7">
+<li>john: 开源的密码破解工具。用于破解各种加密密码，包括Unix&#x2F;Linux密码、Windows密码和其他加密格式。它支持多种攻击模式，如字典攻击和暴力破解。</li>
+</ol>
+</li>
+<li><ol start="8">
+<li>neo4j: 图形数据库管理系统。用于存储和查询图形数据，适合处理复杂的关系数据。它常用于社交网络分析、推荐系统和网络安全分析。</li>
+</ol>
+</li>
+<li><ol start="9">
+<li>smbmap: 枚举和访问SMB共享的工具。用于检查Windows共享的权限和内容，帮助渗透测试人员发现潜在的敏感信息。</li>
+</ol>
+</li>
+<li><ol start="10">
+<li>kerbrute: Kerberos身份验证的暴力破解工具。用于尝试破解Kerberos票证的用户名和密码，帮助渗透测试人员进行身份验证测试。</li>
+</ol>
+</li>
+<li><ol start="11">
+<li>crackmapexec: Windows网络的渗透测试工具。用于自动化对Windows网络的攻击，包括凭证验证、SMB共享枚举和远程命令执行。</li>
+</ol>
+</li>
+<li><ol start="12">
+<li>evil-winrm: Windows远程管理的工具。用于通过Windows远程管理（WinRM）协议进行远程命令执行，帮助渗透测试人员访问Windows主机。</li>
+</ol>
+</li>
+<li><ol start="13">
+<li>sharphound: BloodHound工具的一部分，用于Active Directory环境的枚举。用于收集Active Directory中的信息，帮助识别潜在的攻击路径和权限提升的机会。</li>
+</ol>
+</li>
+<li><ol start="14">
+<li>secretsdump: Impacket库中的一个工具。用于从Windows系统中提取密码哈希、Kerberos票证和其他敏感信息，帮助渗透测试人员进行后期利用。</li>
+</ol>
+</li>
+<li><ol start="15">
+<li>impacket-smbserver: Impacket库中的一个工具。用于创建一个SMB服务器，允许渗透测试人员在目标网络中共享文件和执行命令。</li>
+</ol>
+</li>
+<li><ol start="16">
+<li>rlwrap: 命令行工具，用于为其他命令提供行编辑功能。用于增强命令行界面的交互性，支持历史记录和自动补全，常用于增强Python交互式Shell的体验。</li>
+</ol>
+</li>
+<li><ol start="17">
+<li>nishang: PowerShell框架。用于渗透测试和红队操作，提供多种PowerShell脚本和模块，帮助执行攻击和信息收集。</li>
+</ol>
+</li>
+<li><ol start="18">
+<li>pup.ps1: PowerShell脚本。用于从Windows系统中提取和处理信息，通常用于渗透测试和信息收集。</li>
+</ol>
+</li>
+<li><ol start="19">
+<li>powerview.ps1: PowerShell脚本集。用于Active Directory环境的枚举和信息收集，帮助渗透测试人员识别权限和攻击路径。</li>
+</ol>
+</li>
+<li><ol start="20">
+<li>certutil.exe: Windows中的证书工具。用于管理和操作证书，包括导入、导出和验证证书，常用于安全审计和渗透测试。</li>
+</ol>
+</li>
+<li><ol start="21">
+<li>nc.exe (Netcat): 网络工具。用于读写网络连接，支持TCP和UDP协议，常用于调试、网络扫描和反向Shell。</li>
+</ol>
+</li>
+<li><ol start="22">
+<li>juicypotato.exe: Windows权限提升工具。用于利用Windows的COM对象进行权限提升，帮助渗透测试人员获取更高的系统权限。</li>
+</ol>
+</li>
+<li><ol start="23">
+<li>memexec: 用于在内存中执行代码的工具，主要用于渗透测试和红队操作。它的设计目的是允许用户将有效载荷直接加载到内存中并执行，而不需要将其写入磁盘。</li>
+</ol>
+</li>
+</ul>
+<h2 id="相关技巧"><a href="#相关技巧" class="headerlink" title="相关技巧"></a>相关技巧</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/swisskyrepo/PayloadsAllTheThings">Payloads All The Things</a></li>
+<li><a target="_blank" rel="noopener" href="https://book.hacktricks.xyz/">HackTricks</a></li>
+<li><a target="_blank" rel="noopener" href="https://int0x33.github.io/">GTFOBins</a></li>
+</ul>
+<h2 id="技术资料"><a href="#技术资料" class="headerlink" title="技术资料"></a>技术资料</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://bbs.kanxue.com/thread-272797.htm">Linux x64 inline hook详解及代码实现</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/capstone-engine/capstone">反汇编框架capstone</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/google/fuzzing/tree/master">google模糊测试框架</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.gnu.org/software/gnulib/manual/html_node/LD-Version-Scripts.html">LD Version Scripts控制符号可见性</a></li>
+<li><a target="_blank" rel="noopener" href="https://wiki.wireshark.org/SampleCaptures/">Wireshark样例数据包</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.ddosi.org/b419/">Hetty HTTP开源工具包-Burp Suite未来替代品</a></li>
+</ul>
+<h2 id="CTF-x2F-PWN"><a href="#CTF-x2F-PWN" class="headerlink" title="CTF&#x2F;PWN"></a>CTF&#x2F;PWN</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://ctf-wiki.org/pwn/linux/kernel-mode/environment/qemu-emulate/">Qemu模拟CTF环境 </a></li>
+<li><a target="_blank" rel="noopener" href="https://ctf-wiki.org/pwn/linux/kernel-mode/basic-knowledge/">CTF基础知识</a></li>
+</ul>
+<h2 id="代码扫描"><a href="#代码扫描" class="headerlink" title="代码扫描:"></a>代码扫描:</h2><h4 id="coverity扫描"><a href="#coverity扫描" class="headerlink" title="coverity扫描"></a>coverity扫描</h4><ul>
+<li><a target="_blank" rel="noopener" href="https://www.coverity.com.cn/support.html">Coverity 教程中心</a></li>
+<li><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/article/2225046">Coverity代码审计&#x2F;代码扫描工具的使用教程</a></li>
+</ul>
+<h4 id="whitesource扫描"><a href="#whitesource扫描" class="headerlink" title="whitesource扫描"></a>whitesource扫描</h4><ul>
+<li><a target="_blank" rel="noopener" href="https://www.infoq.cn/article/2018/08/whitesource-free-oss-checking">WhiteSource 推出免费开源的漏洞检查工具</a></li>
+</ul>
+<h4 id="codeql扫描"><a href="#codeql扫描" class="headerlink" title="codeql扫描"></a>codeql扫描</h4><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/github/codeql">codeql github</a></li>
+<li><a target="_blank" rel="noopener" href="https://codeql.github.com/">codeql pages</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/github/codeql-cli-binaries">codeql-cli-binaries</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://skippor.github.io/2024/05/16/security-notes/" data-id="cm4rvlj5e000h7078c8y18coi" data-title="安全笔记" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/kernel/" rel="tag">kernel</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/linux/" rel="tag">linux</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2024/06/05/work-openstick/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">前一篇</strong>
+      <div class="article-nav-title">
+        
+          随身Wifi刷机资料
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2024/03/27/ovs-rxq/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">OVS收包队列分配</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/concurrency/" rel="tag">concurrency</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dpdk/" rel="tag">dpdk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ebpf/" rel="tag">ebpf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/" rel="tag">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/" rel="tag">https</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ikev1/" rel="tag">ikev1</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ikev2/" rel="tag">ikev2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ipsec/" rel="tag">ipsec</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k3s/" rel="tag">k3s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kernel/" rel="tag">kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/" rel="tag">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/" rel="tag">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/network/" rel="tag">network</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/" rel="tag">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstick/" rel="tag">openstick</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ovs/" rel="tag">ovs</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/perf/" rel="tag">perf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/performance/" rel="tag">performance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/qemu/" rel="tag">qemu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reprint/" rel="tag">reprint</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rust/" rel="tag">rust</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rxe/" rel="tag">rxe</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/" rel="tag">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/siw/" rel="tag">siw</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/socket/" rel="tag">socket</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/" rel="tag">ssl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/study/" rel="tag">study</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tips/" rel="tag">tips</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/" rel="tag">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wifi/" rel="tag">wifi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/" rel="tag">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/" rel="tag">work</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xdp/" rel="tag">xdp</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/concurrency/" style="font-size: 10px;">concurrency</a> <a href="/tags/dpdk/" style="font-size: 11.67px;">dpdk</a> <a href="/tags/ebpf/" style="font-size: 10px;">ebpf</a> <a href="/tags/hexo/" style="font-size: 10px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/ikev1/" style="font-size: 10px;">ikev1</a> <a href="/tags/ikev2/" style="font-size: 10px;">ikev2</a> <a href="/tags/ipsec/" style="font-size: 11.67px;">ipsec</a> <a href="/tags/k3s/" style="font-size: 11.67px;">k3s</a> <a href="/tags/kernel/" style="font-size: 18.33px;">kernel</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/network/" style="font-size: 13.33px;">network</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/openstick/" style="font-size: 10px;">openstick</a> <a href="/tags/ovs/" style="font-size: 10px;">ovs</a> <a href="/tags/perf/" style="font-size: 10px;">perf</a> <a href="/tags/performance/" style="font-size: 10px;">performance</a> <a href="/tags/qemu/" style="font-size: 11.67px;">qemu</a> <a href="/tags/reprint/" style="font-size: 15px;">reprint</a> <a href="/tags/rust/" style="font-size: 10px;">rust</a> <a href="/tags/rxe/" style="font-size: 10px;">rxe</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/siw/" style="font-size: 10px;">siw</a> <a href="/tags/socket/" style="font-size: 10px;">socket</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/study/" style="font-size: 11.67px;">study</a> <a href="/tags/tips/" style="font-size: 10px;">tips</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/wifi/" style="font-size: 10px;">wifi</a> <a href="/tags/windows/" style="font-size: 11.67px;">windows</a> <a href="/tags/work/" style="font-size: 16.67px;">work</a> <a href="/tags/xdp/" style="font-size: 10px;">xdp</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/12/">十二月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/09/">九月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/08/">八月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/07/">七月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/06/">六月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/05/">五月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/03/">三月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/02/">二月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/11/">十一月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/10/">十月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/09/">九月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/08/">八月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/07/">七月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/06/">六月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/04/">四月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/03/">三月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/02/">二月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/01/">一月 2023</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2024/12/16/rdma-soft-siw/">Linux软件RDMA环境搭建之SIW</a>
+          </li>
+        
+          <li>
+            <a href="/2024/12/12/rdma-soft-rxe/">Linux软件RDMA环境搭建之RXE</a>
+          </li>
+        
+          <li>
+            <a href="/2024/12/08/linux-problem/">Linux网络之疑难杂症集合</a>
+          </li>
+        
+          <li>
+            <a href="/2024/09/05/work-vscode/">vscode远程开发环境搭建</a>
+          </li>
+        
+          <li>
+            <a href="/2024/08/05/windows-cron/">WINDOWS定时任务通知</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2024 Skippor<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.4.1.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
