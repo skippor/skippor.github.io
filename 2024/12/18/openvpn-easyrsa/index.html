@@ -4,14 +4,19 @@
   <meta charset="utf-8">
   
   
-  <title>标签: nginx | Skippor&#39;s Blog</title>
+  <title>使用openvpn+easyrsa搭建VPN测试环境 | Skippor&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Skippor&#39;s Blog">
-<meta property="og:url" content="https://skippor.github.io/tags/nginx/index.html">
+  <meta name="description" content="环境">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用openvpn+easyrsa搭建VPN测试环境">
+<meta property="og:url" content="https://skippor.github.io/2024/12/18/openvpn-easyrsa/index.html">
 <meta property="og:site_name" content="Skippor&#39;s Blog">
+<meta property="og:description" content="环境">
 <meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-12-18T10:23:03.000Z">
+<meta property="article:modified_time" content="2024-12-19T03:54:09.409Z">
 <meta property="article:author" content="Skippor">
+<meta property="article:tag" content="misc">
 <meta name="twitter:card" content="summary">
   
     <link rel="alternate" href="/atom.xml" title="Skippor's Blog" type="application/atom+xml">
@@ -69,39 +74,71 @@
 </header>
 
       <div class="outer">
-        <section id="main">
-  
-  
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/archives/2023" class="archive-year">2023</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2023/05/16/nginx-basic/" class="archive-article-date">
-  <time class="dt-published" datetime="2023-05-16T16:12:03.000Z" itemprop="datePublished">5月 16</time>
+        <section id="main"><article id="post-openvpn-easyrsa" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2024/12/18/openvpn-easyrsa/" class="article-date">
+  <time class="dt-published" datetime="2024-12-18T10:23:03.000Z" itemprop="datePublished">2024-12-18</time>
 </a>
-      
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2023/05/16/nginx-basic/">Linux网络之nginx基础</a>
+    <h1 class="p-name article-title" itemprop="headline name">
+      使用openvpn+easyrsa搭建VPN测试环境
     </h1>
   
 
-    </header>
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h2><p><strong>centos 7</strong></p>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><h4 id="1-命令行安装"><a href="#1-命令行安装" class="headerlink" title="1. 命令行安装"></a>1. 命令行安装</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">yum install -y lzo openssl pam</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">yum install -y epel-release</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">yum install -y openvpn easy-rsa iptables-services</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="2-源码安装"><a href="#2-源码安装" class="headerlink" title="2. 源码安装"></a>2. 源码安装</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">To get the latest release of OpenVPN, go to https://openvpn.net/community-downloads/:</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">wget https://swupdate.openvpn.org/community/releases/openvpn-2.6.12.tar.gz</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">To Build and Install,</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">tar -zxf openvpn-&lt;version&gt;.tar.gz</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">cd</span> openvpn-&lt;version&gt;</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">./configure</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">make</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">make install</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">easyrsa</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">wget https://github.com/OpenVPN/easy-rsa/releases/download/v3.1.2/EasyRSA-3.1.2.tgz</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/forlive/p/16850177.html">centos7部署easyrsa打通内网</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.xionghaier.cn/archives/367.html">基于easy-rsa-3.0搭建VPN服务之OpenVPN</a></li>
+<li><a target="_blank" rel="noopener" href="https://juejin.cn/post/7400945359192948748">告别繁琐设置，用OpenVPN一键实现内网穿透与远程办公</a></li>
+<li><a target="_blank" rel="noopener" href="https://opswill.com/articles/linux-openvpn-server-setup.html">openvpn的搭建与使用</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhou-yuxin.github.io/articles/2017/Linux%20%E6%90%AD%E5%BB%BAOpenVPN%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%92%8C%E5%AE%A2%E6%88%B7%E7%AB%AF%EF%BC%88%E4%B8%80%EF%BC%89%E2%80%94%E2%80%94%E6%9C%80%E7%AE%80%E9%85%8D%E7%BD%AE/index.html">Linux 搭建OpenVPN服务器和客户端（一）——最简配置</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.dianduidian.com/post/openvpn-server%E6%90%AD%E5%BB%BA%E5%B9%B6%E4%BD%BF%E7%94%A8%E5%AE%A2%E6%88%B7%E7%AB%AF%E8%AF%81%E4%B9%A6%E8%AE%A4%E8%AF%81/">OpenVPN Server搭建及使用客户端证书认证</a></li>
+</ul>
+<h2 id="相关项目"><a href="#相关项目" class="headerlink" title="相关项目"></a>相关项目</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://github.com/OpenVPN/openvpn">OpenVPN – A Secure tunneling daemon</a></li>
+<li><a target="_blank" rel="noopener" href="https://github.com/OpenVPN/easy-rsa">easy-rsa - Simple shell based CA utility</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://skippor.github.io/2024/12/18/openvpn-easyrsa/" data-id="cm4usfiv1000004784znwf2sy" data-title="使用openvpn+easyrsa搭建VPN测试环境" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/misc/" rel="tag">misc</a></li></ul>
+
+    </footer>
   </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2024/12/16/rdma-soft-siw/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">Linux软件RDMA环境搭建之SIW</div>
+    </a>
+  
+</nav>
+
+  
 </article>
-  
-  
-    </div></section>
-  
 
 
 </section>
