@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>GCC内建函数 | Skippor&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="1. 什么是 GCC 内建函数">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GCC内建函数">
+<meta property="og:url" content="https://skippor.github.io/2024/11/18/gcc-builtins/index.html">
+<meta property="og:site_name" content="Skippor&#39;s Blog">
+<meta property="og:description" content="1. 什么是 GCC 内建函数">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-11-18T10:23:03.000Z">
+<meta property="article:modified_time" content="2024-12-20T06:05:21.639Z">
+<meta property="article:author" content="Skippor">
+<meta property="article:tag" content="gcc">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Skippor's Blog" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Skippor&#39;s Blog</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://skippor.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-gcc-builtins" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2024/11/18/gcc-builtins/" class="article-date">
+  <time class="dt-published" datetime="2024-11-18T10:23:03.000Z" itemprop="datePublished">2024-11-18</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      GCC内建函数
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="1-什么是-GCC-内建函数"><a href="#1-什么是-GCC-内建函数" class="headerlink" title="1. 什么是 GCC 内建函数"></a>1. 什么是 GCC 内建函数</h2><p>GCC 内建函数（Built - in functions）是 GCC 编译器提供的一组特殊函数。这些函数不是标准 C 库或其他标准库的一部分，而是直接由编译器支持，它们被编译进程序代码中，就好像它们是普通的函数调用一样，但在某些情况下可以生成更高效的机器码。例如，一些内建函数可以直接利用处理器的特殊指令来执行操作，而不需要通过复杂的库函数调用过程。</p>
+<h2 id="2-使用-GCC-内建函数的好处"><a href="#2-使用-GCC-内建函数的好处" class="headerlink" title="2. 使用 GCC 内建函数的好处"></a>2. 使用 GCC 内建函数的好处</h2><ul>
+<li>性能优化：编译器可以针对内建函数进行特殊的优化，因为它清楚这些函数的具体行为。例如，对于一些频繁使用的操作，如内存复制或者位操作，内建函数可能会利用处理器的特殊指令集来加速执行，从而提高程序的整体性能。</li>
+<li>与编译器紧密集成：内建函数能够更好地与编译器的其他功能配合。比如，在进行代码优化阶段，编译器可以对内建函数和其他代码一起进行优化，考虑到内建函数的特性，生成更高效的机器码。</li>
+<li>方便进行错误检查：像__builtin_add_overflow这样的函数，可以帮助程序员方便地检查算术运算中的错误情况，如溢出等，这有助于编写更健壮的代码。</li>
+</ul>
+<h2 id="3-常用的内联函数"><a href="#3-常用的内联函数" class="headerlink" title="3. 常用的内联函数"></a>3. 常用的内联函数</h2><h3 id="3-1-算术运算相关内建函数"><a href="#3-1-算术运算相关内建函数" class="headerlink" title="3.1 算术运算相关内建函数"></a>3.1 算术运算相关内建函数</h3><ul>
+<li><p><strong>__builtin_add_overflow</strong></p>
+<ul>
+<li>简介：用于检测有符号整数加法是否溢出。它接受三个参数，前两个是相加的操作数，第三个是一个指向结果存储位置的指针。如果加法溢出，函数返回非零值，并将溢出后的值存储在第三个参数指向的位置；如果没有溢出，返回 0。</li>
+</ul>
+</li>
+<li><p><strong>__builtin_sub_overflow</strong></p>
+<ul>
+<li>简介：和__builtin_add_overflow类似，但是用于检测有符号整数减法是否溢出。它检查第一个操作数减去第二个操作数是否会产生溢出情况。</li>
+</ul>
+</li>
+<li><p><strong>__builtin_mul_overflow</strong></p>
+<ul>
+<li>简介：用于检测有符号整数乘法是否溢出。在进行乘法运算时，通过这个函数可以判断结果是否超出了有符号整数的表示范围。</li>
+</ul>
+</li>
+<li><p><strong>__builtin_umaddl_overflow</strong></p>
+<ul>
+<li>简介：针对无符号整数乘法和加法组合操作（a * b + c）检测溢出。这在处理高精度计算或者需要考虑运算结果范围的情况下非常有用。</li>
+</ul>
+</li>
+<li><p><strong>__builtin_saddl_overflow</strong></p>
+<ul>
+<li>简介：用于检测长整型（long int）加法是否溢出，和__builtin_add_overflow功能类似，但操作数类型为长整型。</li>
+</ul>
+</li>
+<li><p><strong>__builtin_ssubl_overflow</strong></p>
+<ul>
+<li>简介：用于检测长整型减法是否溢出，和__builtin_sub_overflow功能类似，针对长整型操作数。</li>
+</ul>
+</li>
+<li><p><strong>__builtin_smull_overflow</strong></p>
+<ul>
+<li>简介：用于检测长整型乘法是否溢出，和__builtin_mul_overflow功能类似，不过是用于长整型。</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-2-内存操作相关内建函数"><a href="#3-2-内存操作相关内建函数" class="headerlink" title="3.2 内存操作相关内建函数"></a>3.2 内存操作相关内建函数</h3><ul>
+<li><p><strong>__builtin_memcpy</strong></p>
+<ul>
+<li>简介：执行内存复制操作，类似于标准 C 库中的memcpy函数。它可以将一段内存中的数据复制到另一段内存中，并且编译器可能会对其进行优化，提高内存复制的效率。</li>
+</ul>
+</li>
+<li><p><strong>__builtin_memmove</strong></p>
+<ul>
+<li>简介：功能类似于__builtin_memcpy，但在源和目标内存区域重叠的情况下，__builtin_memmove能保证正确地复制数据，而memcpy的行为在这种情况下是未定义的。</li>
+</ul>
+</li>
+<li><p><strong>__builtin_memset</strong></p>
+<ul>
+<li>简介：用于将一段内存区域设置为指定的值。通常用于初始化数组或者清除内存中的数据，比手动循环设置内存单元更高效。</li>
+</ul>
+</li>
+<li><p><strong>__builtin___memcpy_chk</strong></p>
+<ul>
+<li>简介：是一种带有边界检查的内存复制函数。它在复制内存的同时会检查目标缓冲区的大小是否足够，以防止缓冲区溢出错误。</li>
+</ul>
+</li>
+<li><p><strong>__builtin___memset_chk</strong></p>
+<ul>
+<li>简介：类似__builtin___memcpy_chk，是带有边界检查的内存设置函数，确保设置内存操作不会超出缓冲区范围。</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-3-位操作相关内建函数"><a href="#3-3-位操作相关内建函数" class="headerlink" title="3.3 位操作相关内建函数"></a>3.3 位操作相关内建函数</h3><ul>
+<li><p><strong>__builtin_popcount</strong></p>
+<ul>
+<li>简介：计算一个无符号整数中设置为1的位的数量。例如，对于二进制数1011，它会返回3，因为这个数中有3个1。该函数在处理位掩码等操作时很有用。</li>
+</ul>
+</li>
+<li><p><strong>__builtin_popcountl</strong></p>
+<ul>
+<li>简介：和__builtin_popcount类似，但操作数是unsigned long类型，用于计算无符号长整数中1的位数。</li>
+</ul>
+</li>
+<li><p><strong>__builtin_clz</strong></p>
+<ul>
+<li>简介：计算无符号整数二进制表示中前导0的数量。例如，对于二进制数000101，它会返回3，因为前面有3个0。这个函数在处理位对齐等操作时很有帮助。</li>
+</ul>
+</li>
+<li><p><strong>__builtin_ctz</strong></p>
+<ul>
+<li>简介：计算无符号整数二进制表示中尾随0的数量。比如对于二进制数10100，它会返回2，因为末尾有2个0。</li>
+</ul>
+</li>
+<li><p><strong>__builtin_ffs</strong></p>
+<ul>
+<li>简介：返回x的最后一位1的是从后向前第几位，比如7368（1110011001000）返回4。</li>
+</ul>
+</li>
+<li><p><strong>__builtin_parity</strong></p>
+<ul>
+<li>简介：返回x的奇偶校验位，也就是x的1的个数模2的结果。等效于__builtin_popcount(x) &amp; 1。</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-4-类型转换相关内建函数"><a href="#3-4-类型转换相关内建函数" class="headerlink" title="3.4 类型转换相关内建函数"></a>3.4 类型转换相关内建函数</h3><ul>
+<li><p><strong>__builtin_bswap16</strong>&#x2F;<strong>__builtin_bswap32</strong>&#x2F;<strong>__builtin_bswap64</strong></p>
+<ul>
+<li>简介：这些函数分别用于交换 16 位、32 位和 64 位整数的字节顺序。在处理网络协议或者不同字节序的文件格式等场景中非常有用。例如，在网络通信中，数据通常是以大端序（高位字节在前）传输的，而某些处理器可能是小端序（低位字节在前）存储数据，通过这些函数可以方便地进行字节序转换。</li>
+</ul>
+</li>
+<li><p><strong>__builtin_types_compatible_p</strong></p>
+<ul>
+<li>简介：用于检查两个类型是否兼容。它是一个编译时求值的函数，返回一个整数，1表示两个类型兼容，0表示不兼容。这在编写通用代码或者模板代码时，对于类型检查很有帮助。</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-5-函数调用相关内建函数"><a href="#3-5-函数调用相关内建函数" class="headerlink" title="3.5 函数调用相关内建函数"></a>3.5 函数调用相关内建函数</h3><ul>
+<li><p><strong>__builtin_call_with_args</strong></p>
+<ul>
+<li>简介：这是一个比较复杂的内建函数，用于以特定的参数调用另一个函数。它在一些高级的代码生成场景或者对函数调用进行动态处理时可能会用到，不过使用频率相对较低。</li>
+</ul>
+</li>
+<li><p><strong>__builtin_apply_args和__builtin_apply</strong></p>
+<ul>
+<li>简介：这两个函数一起用于实现一种类似于函数指针调用的机制，同时还可以处理可变数量的参数。它们在实现一些复杂的函数调用逻辑，特别是涉及到可变参数列表和动态函数调用的情况下很有用。</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-6-其他杂项内建函数"><a href="#3-6-其他杂项内建函数" class="headerlink" title="3.6 其他杂项内建函数"></a>3.6 其他杂项内建函数</h3><ul>
+<li><p><strong>__builtin_return_address</strong></p>
+<ul>
+<li>简介：用于获取当前函数的返回地址。这在调试或者某些需要跟踪函数调用链的场景下可能会用到。不过需要注意的是，在一些优化级别下，返回地址可能会因为内联等操作而不准确。</li>
+</ul>
+</li>
+<li><p><strong>__builtin_frame_address</strong></p>
+<ul>
+<li>简介：返回当前函数的栈帧地址。栈帧是函数调用过程中在栈上分配的一块内存区域，用于存储函数的局部变量、参数和返回地址等信息。这个函数可以帮助在调试或者分析栈相关的问题时获取有用的信息。</li>
+</ul>
+</li>
+<li><p><strong>__builtin_expect</strong></p>
+<ul>
+<li>简介：用于给编译器提供分支预测的提示。它接受两个参数，第一个是一个表达式，第二个是一个预期的值（通常是0或者1）。编译器可以根据这个提示来优化分支指令，提高程序的执行效率。例如，如果一个条件分支经常为真，通过__builtin_expect告知编译器后，编译器可以将更可能执行的代码路径放在更靠近处理器的分支预测单元的位置。</li>
+</ul>
+</li>
+<li><p><strong>__builtin_constant_p</strong></p>
+<ul>
+<li>简介：用于判断一个表达式是否在编译时为常量。这在编写宏或者模板代码时，对于区分常量和变量表达式很有用，可以根据这个判断来进行不同的代码生成策略。</li>
+</ul>
+</li>
+<li><p><strong>__builtin_alloca</strong></p>
+<ul>
+<li>简介：用于在栈上动态分配内存。与malloc等函数不同，__builtin_alloca分配的内存是在当前函数的栈帧上，当函数返回时自动释放。这在需要临时分配一些小的内存空间，且不希望手动管理内存释放的情况下很有用。</li>
+</ul>
+</li>
+<li><p><strong>__builtin_nan</strong>&#x2F;<strong>__builtin_inf</strong></p>
+<ul>
+<li>简介：分别用于创建非数字（NaN）和无穷大（inf）的值。在处理浮点数运算，特别是涉及到数学库函数或者特殊数学概念（如极限）的场景下可能会用到这些函数。</li>
+</ul>
+</li>
+</ul>
+<h2 id="4-Built-in相关的compiler-options"><a href="#4-Built-in相关的compiler-options" class="headerlink" title="4. Built in相关的compiler options"></a>4. Built in相关的compiler options</h2><ul>
+<li><p><strong>-fbuiltin</strong></p>
+<ul>
+<li>这是默认选项，用于通过名字来识别内建函数</li>
+</ul>
+</li>
+<li><p><strong>-fno-builtin</strong></p>
+<ul>
+<li>除非利用前缀 _<em>builtin</em> 进行引用，否则不识别所有内建函数。例如，为了获得内建版本，应该调用 __builtin_strcpy() 而不是名为 strcpy() 的函数。</li>
+</ul>
+</li>
+<li><p><strong>-fno-builtin-xxx</strong></p>
+<ul>
+<li>例如：-fno-builtin-sqrt：想使用除sqrt() 之外的所有内建函数</li>
+</ul>
+</li>
+</ul>
+<h2 id="5-参考"><a href="#5-参考" class="headerlink" title="5. 参考"></a>5. 参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://gcc.gnu.org/onlinedocs/gcc/Return-Address.html">获取函数的返回地址或帧地址</a></li>
+<li><a target="_blank" rel="noopener" href="https://gcc.gnu.org/onlinedocs/gcc/Other-Builtins.html">GCC 提供的其他内置函数</a></li>
+<li><a target="_blank" rel="noopener" href="https://gcc.gnu.org/onlinedocs/gcc/Target-Builtins.html">特定目标机器的内置函数</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://skippor.github.io/2024/11/18/gcc-builtins/" data-id="cm4wdqamr0001mx781oq45zt0" data-title="GCC内建函数" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/gcc/" rel="tag">gcc</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2024/12/08/linux-problem/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">前一篇</strong>
+      <div class="article-nav-title">
+        
+          Linux网络之疑难杂症集合
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2024/10/16/go-notes/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">Go学习笔记</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/cert/" rel="tag">cert</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/concurrency/" rel="tag">concurrency</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dataplane/" rel="tag">dataplane</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/deb/" rel="tag">deb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/" rel="tag">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dpdk/" rel="tag">dpdk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ebpf/" rel="tag">ebpf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gcc/" rel="tag">gcc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gm/" rel="tag">gm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/" rel="tag">go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/grpc/" rel="tag">grpc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/" rel="tag">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/" rel="tag">https</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ikev1/" rel="tag">ikev1</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ikev2/" rel="tag">ikev2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/io/" rel="tag">io</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ipsec/" rel="tag">ipsec</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k3s/" rel="tag">k3s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kernel/" rel="tag">kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/" rel="tag">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/memory/" rel="tag">memory</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/misc/" rel="tag">misc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/" rel="tag">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/network/" rel="tag">network</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/" rel="tag">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/notes/" rel="tag">notes</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstick/" rel="tag">openstick</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ovs/" rel="tag">ovs</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/package/" rel="tag">package</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandas/" rel="tag">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/performance/" rel="tag">performance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/" rel="tag">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/qemu/" rel="tag">qemu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reprint/" rel="tag">reprint</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rpm/" rel="tag">rpm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rust/" rel="tag">rust</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rxe/" rel="tag">rxe</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sdn/" rel="tag">sdn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/security/" rel="tag">security</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/" rel="tag">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/siw/" rel="tag">siw</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/socket/" rel="tag">socket</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/" rel="tag">ssl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/study/" rel="tag">study</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tips/" rel="tag">tips</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vpn/" rel="tag">vpn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/" rel="tag">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wifi/" rel="tag">wifi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/" rel="tag">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wireguard/" rel="tag">wireguard</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/" rel="tag">work</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xdp/" rel="tag">xdp</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/cert/" style="font-size: 10px;">cert</a> <a href="/tags/concurrency/" style="font-size: 10px;">concurrency</a> <a href="/tags/dataplane/" style="font-size: 10px;">dataplane</a> <a href="/tags/deb/" style="font-size: 10px;">deb</a> <a href="/tags/docker/" style="font-size: 10px;">docker</a> <a href="/tags/dpdk/" style="font-size: 11.67px;">dpdk</a> <a href="/tags/ebpf/" style="font-size: 11.67px;">ebpf</a> <a href="/tags/gcc/" style="font-size: 10px;">gcc</a> <a href="/tags/gm/" style="font-size: 11.67px;">gm</a> <a href="/tags/go/" style="font-size: 10px;">go</a> <a href="/tags/grpc/" style="font-size: 10px;">grpc</a> <a href="/tags/hexo/" style="font-size: 11.67px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/ikev1/" style="font-size: 13.33px;">ikev1</a> <a href="/tags/ikev2/" style="font-size: 10px;">ikev2</a> <a href="/tags/io/" style="font-size: 10px;">io</a> <a href="/tags/ipsec/" style="font-size: 15px;">ipsec</a> <a href="/tags/k3s/" style="font-size: 10px;">k3s</a> <a href="/tags/kernel/" style="font-size: 18.33px;">kernel</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/memory/" style="font-size: 10px;">memory</a> <a href="/tags/misc/" style="font-size: 10px;">misc</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/network/" style="font-size: 16.67px;">network</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/notes/" style="font-size: 13.33px;">notes</a> <a href="/tags/openstick/" style="font-size: 10px;">openstick</a> <a href="/tags/ovs/" style="font-size: 10px;">ovs</a> <a href="/tags/package/" style="font-size: 11.67px;">package</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/performance/" style="font-size: 11.67px;">performance</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/qemu/" style="font-size: 11.67px;">qemu</a> <a href="/tags/reprint/" style="font-size: 16.67px;">reprint</a> <a href="/tags/rpm/" style="font-size: 10px;">rpm</a> <a href="/tags/rust/" style="font-size: 10px;">rust</a> <a href="/tags/rxe/" style="font-size: 10px;">rxe</a> <a href="/tags/sdn/" style="font-size: 10px;">sdn</a> <a href="/tags/security/" style="font-size: 10px;">security</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/siw/" style="font-size: 10px;">siw</a> <a href="/tags/socket/" style="font-size: 10px;">socket</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/study/" style="font-size: 11.67px;">study</a> <a href="/tags/tips/" style="font-size: 10px;">tips</a> <a href="/tags/vpn/" style="font-size: 15px;">vpn</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/wifi/" style="font-size: 10px;">wifi</a> <a href="/tags/windows/" style="font-size: 11.67px;">windows</a> <a href="/tags/wireguard/" style="font-size: 10px;">wireguard</a> <a href="/tags/work/" style="font-size: 18.33px;">work</a> <a href="/tags/xdp/" style="font-size: 10px;">xdp</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/12/">十二月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/11/">十一月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/10/">十月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/09/">九月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/08/">八月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/07/">七月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/06/">六月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/05/">五月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/03/">三月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/02/">二月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/11/">十一月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/10/">十月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/09/">九月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/08/">八月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/07/">七月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/06/">六月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/04/">四月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/03/">三月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/02/">二月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/01/">一月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/12/">十二月 2022</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2024/12/18/openvpn-easyrsa/">使用openvpn+easyrsa搭建VPN测试环境</a>
+          </li>
+        
+          <li>
+            <a href="/2024/12/16/rdma-soft-siw/">Linux软件RDMA环境搭建之SIW</a>
+          </li>
+        
+          <li>
+            <a href="/2024/12/12/rdma-soft-rxe/">Linux软件RDMA环境搭建之RXE</a>
+          </li>
+        
+          <li>
+            <a href="/2024/12/08/linux-problem/">Linux网络之疑难杂症集合</a>
+          </li>
+        
+          <li>
+            <a href="/2024/11/18/gcc-builtins/">GCC内建函数</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2024 Skippor<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.4.1.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
