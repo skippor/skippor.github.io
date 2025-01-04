@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  
+  <title>openssl常用命令 | Skippor&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="笔记">
+<meta property="og:type" content="article">
+<meta property="og:title" content="openssl常用命令">
+<meta property="og:url" content="https://skippor.github.io/2024/12/30/misc-openssl/index.html">
+<meta property="og:site_name" content="Skippor&#39;s Blog">
+<meta property="og:description" content="笔记">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-12-30T10:23:03.000Z">
+<meta property="article:modified_time" content="2025-01-04T07:24:16.021Z">
+<meta property="article:author" content="Skippor">
+<meta property="article:tag" content="misc">
+<meta property="article:tag" content="openssl">
+<meta name="twitter:card" content="summary">
+  
+    <link rel="alternate" href="/atom.xml" title="Skippor's Blog" type="application/atom+xml">
+  
+  
+    <link rel="shortcut icon" href="/favicon.png">
+  
+  
+    
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
+
+  
+  
+<link rel="stylesheet" href="/css/style.css">
+
+  
+    
+<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
+
+  
+<meta name="generator" content="Hexo 6.3.0"></head>
+
+<body>
+  <div id="container">
+    <div id="wrap">
+      <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Skippor&#39;s Blog</a>
+      </h1>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">Home</a>
+        
+          <a class="main-nav-link" href="/archives">Archives</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS 订阅"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="搜索"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="搜索"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="https://skippor.github.io"></form>
+      </div>
+    </div>
+  </div>
+</header>
+
+      <div class="outer">
+        <section id="main"><article id="post-misc-openssl" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2024/12/30/misc-openssl/" class="article-date">
+  <time class="dt-published" datetime="2024-12-30T10:23:03.000Z" itemprop="datePublished">2024-12-30</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="p-name article-title" itemprop="headline name">
+      openssl常用命令
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h2 id="笔记"><a href="#笔记" class="headerlink" title="笔记"></a>笔记</h2><h4 id="一般证书签发流程"><a href="#一般证书签发流程" class="headerlink" title="一般证书签发流程"></a>一般证书签发流程</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Generate CA private key</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">openssl genrsa -out ca.key 2048</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Generate CSR</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">openssl req -new -key ca.key -out ca.csr</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Generate Self Signed certificate（CA 根证书）</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">openssl x509 -req -days 365 -<span class="keyword">in</span> ca.csr -signkey ca.key -out ca.crt</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">private key</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">openssl genrsa -des3 -out server.key 1024</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">generate csr</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">openssl req -new -key server.key -out server.csr</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">generate certificate</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">openssl ca -<span class="keyword">in</span> server.csr -out server.crt -cert ca.crt -keyfile ca.key</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="各种格式证书生成"><a href="#各种格式证书生成" class="headerlink" title="各种格式证书生成"></a>各种格式证书生成</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">生成普通证书</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">openssl x509 -req -<span class="keyword">in</span> user.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out user.crt -days 3650</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">p12证书生成</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">openssl pkcs12 -<span class="built_in">export</span> -inkey user.key -<span class="keyword">in</span> user.crt -password <span class="string">&quot;pass:passwd&quot;</span> -out <span class="string">&quot;user.p12&quot;</span></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">p7b证书生成</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">openssl crl2pkcs7 -nocrl -certfile out/sha1_1024.crt  -certfile server.crt -out certificate.p7b</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="PKCS12证书操作"><a href="#PKCS12证书操作" class="headerlink" title="PKCS12证书操作"></a>PKCS12证书操作</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">PKCS12</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">openssl pkcs12 -<span class="keyword">in</span> in.pfx -password <span class="string">&quot;pass:123456&quot;</span> -nodes -out tmp_out.cer</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">opwnssl pkcs12 -<span class="keyword">in</span> in.pfx -password <span class="string">&quot;pass:123456&quot;</span> -nodes -nocerts -out out.key</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">openssl x509 -<span class="keyword">in</span> tmp_out.cer -out out.cer</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">openssl pkcs12 -<span class="keyword">in</span> sm2.pfx -password <span class="string">&quot;pass:111111&quot;</span> -clcerts -nodes -nokeys</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">openssl pkcs12 -<span class="keyword">in</span> sm2.pfx -password <span class="string">&quot;pass:111111&quot;</span> -nodes -nocerts</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">openssl pkcs12 -<span class="keyword">in</span> server.p12 -cacerts</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">openssl pkcs12 -<span class="keyword">in</span> server.p12 -clcerts</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">openssl pkcs12 -<span class="keyword">in</span> server.p12 -nocerts -nodes</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="其他证书操作"><a href="#其他证书操作" class="headerlink" title="其他证书操作"></a>其他证书操作</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">openssl指定生效时间  -startdate</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">openssl ca -<span class="keyword">in</span> usr.csr -out usr1.crt -startdate `<span class="built_in">date</span> +<span class="string">&quot;%Y%m%d%H%M%S&quot;</span>`<span class="string">&quot;-0800&quot;</span> -cert ca.crt -keyfile ca.key -config /etc/openssl.cnf</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">openssl x509 -req -<span class="keyword">in</span> user.csr -CA ca.crt -CAkey ca.key -out user22.crt -days 3650 -setstartdate `<span class="built_in">date</span> $ +<span class="string">&quot;%Y%m%d%H%M%S&quot;</span>`<span class="string">&quot;-0800&quot;</span></span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">define FORMAT_GEN_CA_CERT</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">openssl x509 -req -<span class="keyword">in</span> %s -out %s -signkey %s -days 3650 -setstartdate `<span class="built_in">date</span> $ +<span class="string">&#x27;%%Y%%m%%d%%H%%M%%S&#x27;</span>`<span class="string">&#x27;-0800&#x27;</span></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">define FORMAT_GEN_USER_CERT <span class="string">&quot;</span></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="string">openssl x509 -req -in %s -out %s -signkey %s -CA %s -CAkey %s -CAcreateserial -days %d  $ -setstartdate `date +&#x27;%%Y%%m%%d%%H%%M%%S&#x27;`&#x27;-0800&#x27;</span></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="string">define FORMAT_GEN_P12_CERT</span></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="string">openssl pkcs12 -export -clcerts -in %s -inkey %s -out %s -password &quot;</span>pass:%s<span class="string">&quot;</span></span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="https://skippor.github.io/2024/12/30/misc-openssl/" data-id="cm5hvfhqs00001o789qyreh1u" data-title="openssl常用命令" class="article-share-link">分享</a>
+      
+      
+      
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/misc/" rel="tag">misc</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/openssl/" rel="tag">openssl</a></li></ul>
+
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2024/12/30/security-nmap/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">后一篇</strong>
+      <div class="article-nav-title">nmap使用指南</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+</section>
+        
+          <aside id="sidebar">
+  
+    
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list" itemprop="keywords"><li class="tag-list-item"><a class="tag-list-link" href="/tags/cert/" rel="tag">cert</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/concurrency/" rel="tag">concurrency</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dataplane/" rel="tag">dataplane</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/deb/" rel="tag">deb</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/" rel="tag">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/dpdk/" rel="tag">dpdk</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ebpf/" rel="tag">ebpf</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gcc/" rel="tag">gcc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/gm/" rel="tag">gm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/go/" rel="tag">go</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/grpc/" rel="tag">grpc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/hexo/" rel="tag">hexo</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/https/" rel="tag">https</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ikev1/" rel="tag">ikev1</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ikev2/" rel="tag">ikev2</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/io/" rel="tag">io</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ipsec/" rel="tag">ipsec</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/k3s/" rel="tag">k3s</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/kernel/" rel="tag">kernel</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/linux/" rel="tag">linux</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/memory/" rel="tag">memory</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/misc/" rel="tag">misc</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/mysql/" rel="tag">mysql</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/network/" rel="tag">network</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nginx/" rel="tag">nginx</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/nmap/" rel="tag">nmap</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/notes/" rel="tag">notes</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openssl/" rel="tag">openssl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openstick/" rel="tag">openstick</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/openvpn/" rel="tag">openvpn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ovs/" rel="tag">ovs</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/package/" rel="tag">package</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/pandas/" rel="tag">pandas</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/performance/" rel="tag">performance</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/python/" rel="tag">python</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/qemu/" rel="tag">qemu</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/reprint/" rel="tag">reprint</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rpm/" rel="tag">rpm</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rust/" rel="tag">rust</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/rxe/" rel="tag">rxe</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/sdn/" rel="tag">sdn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/security/" rel="tag">security</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shadowsocks/" rel="tag">shadowsocks</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/shell/" rel="tag">shell</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/siw/" rel="tag">siw</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/socket/" rel="tag">socket</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ssl/" rel="tag">ssl</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/strongswan/" rel="tag">strongswan</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/study/" rel="tag">study</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/tips/" rel="tag">tips</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/v2ray/" rel="tag">v2ray</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vlan/" rel="tag">vlan</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vpn/" rel="tag">vpn</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vscode/" rel="tag">vscode</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wifi/" rel="tag">wifi</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/windows/" rel="tag">windows</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/wireguard/" rel="tag">wireguard</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/" rel="tag">work</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/xdp/" rel="tag">xdp</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/cert/" style="font-size: 10px;">cert</a> <a href="/tags/concurrency/" style="font-size: 10px;">concurrency</a> <a href="/tags/dataplane/" style="font-size: 10px;">dataplane</a> <a href="/tags/deb/" style="font-size: 10px;">deb</a> <a href="/tags/docker/" style="font-size: 11.43px;">docker</a> <a href="/tags/dpdk/" style="font-size: 11.43px;">dpdk</a> <a href="/tags/ebpf/" style="font-size: 11.43px;">ebpf</a> <a href="/tags/gcc/" style="font-size: 10px;">gcc</a> <a href="/tags/gm/" style="font-size: 11.43px;">gm</a> <a href="/tags/go/" style="font-size: 10px;">go</a> <a href="/tags/grpc/" style="font-size: 10px;">grpc</a> <a href="/tags/hexo/" style="font-size: 11.43px;">hexo</a> <a href="/tags/https/" style="font-size: 10px;">https</a> <a href="/tags/ikev1/" style="font-size: 14.29px;">ikev1</a> <a href="/tags/ikev2/" style="font-size: 11.43px;">ikev2</a> <a href="/tags/io/" style="font-size: 10px;">io</a> <a href="/tags/ipsec/" style="font-size: 15.71px;">ipsec</a> <a href="/tags/k3s/" style="font-size: 10px;">k3s</a> <a href="/tags/kernel/" style="font-size: 18.57px;">kernel</a> <a href="/tags/linux/" style="font-size: 20px;">linux</a> <a href="/tags/memory/" style="font-size: 10px;">memory</a> <a href="/tags/misc/" style="font-size: 10px;">misc</a> <a href="/tags/mysql/" style="font-size: 10px;">mysql</a> <a href="/tags/network/" style="font-size: 15.71px;">network</a> <a href="/tags/nginx/" style="font-size: 10px;">nginx</a> <a href="/tags/nmap/" style="font-size: 10px;">nmap</a> <a href="/tags/notes/" style="font-size: 12.86px;">notes</a> <a href="/tags/openssl/" style="font-size: 10px;">openssl</a> <a href="/tags/openstick/" style="font-size: 10px;">openstick</a> <a href="/tags/openvpn/" style="font-size: 10px;">openvpn</a> <a href="/tags/ovs/" style="font-size: 11.43px;">ovs</a> <a href="/tags/package/" style="font-size: 11.43px;">package</a> <a href="/tags/pandas/" style="font-size: 10px;">pandas</a> <a href="/tags/performance/" style="font-size: 11.43px;">performance</a> <a href="/tags/python/" style="font-size: 10px;">python</a> <a href="/tags/qemu/" style="font-size: 11.43px;">qemu</a> <a href="/tags/reprint/" style="font-size: 15.71px;">reprint</a> <a href="/tags/rpm/" style="font-size: 10px;">rpm</a> <a href="/tags/rust/" style="font-size: 10px;">rust</a> <a href="/tags/rxe/" style="font-size: 10px;">rxe</a> <a href="/tags/sdn/" style="font-size: 10px;">sdn</a> <a href="/tags/security/" style="font-size: 11.43px;">security</a> <a href="/tags/shadowsocks/" style="font-size: 10px;">shadowsocks</a> <a href="/tags/shell/" style="font-size: 10px;">shell</a> <a href="/tags/siw/" style="font-size: 10px;">siw</a> <a href="/tags/socket/" style="font-size: 10px;">socket</a> <a href="/tags/ssl/" style="font-size: 10px;">ssl</a> <a href="/tags/strongswan/" style="font-size: 10px;">strongswan</a> <a href="/tags/study/" style="font-size: 11.43px;">study</a> <a href="/tags/tips/" style="font-size: 10px;">tips</a> <a href="/tags/v2ray/" style="font-size: 10px;">v2ray</a> <a href="/tags/vlan/" style="font-size: 10px;">vlan</a> <a href="/tags/vpn/" style="font-size: 17.14px;">vpn</a> <a href="/tags/vscode/" style="font-size: 10px;">vscode</a> <a href="/tags/wifi/" style="font-size: 10px;">wifi</a> <a href="/tags/windows/" style="font-size: 11.43px;">windows</a> <a href="/tags/wireguard/" style="font-size: 10px;">wireguard</a> <a href="/tags/work/" style="font-size: 18.57px;">work</a> <a href="/tags/xdp/" style="font-size: 10px;">xdp</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/12/">十二月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/11/">十一月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/10/">十月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/09/">九月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/08/">八月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/07/">七月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/06/">六月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/05/">五月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/03/">三月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2024/02/">二月 2024</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/11/">十一月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/10/">十月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/09/">九月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/08/">八月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/07/">七月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/06/">六月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/05/">五月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/04/">四月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/03/">三月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/02/">二月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2023/01/">一月 2023</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/12/">十二月 2022</a></li></ul>
+    </div>
+  </div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2024/12/30/misc-openssl/">openssl常用命令</a>
+          </li>
+        
+          <li>
+            <a href="/2024/12/30/security-nmap/">nmap使用指南</a>
+          </li>
+        
+          <li>
+            <a href="/2024/12/30/vpn-shadowsocks/">shadowsocks简易代理隧道</a>
+          </li>
+        
+          <li>
+            <a href="/2024/12/30/vpn-v2ray/">v2ray简易代理隧道</a>
+          </li>
+        
+          <li>
+            <a href="/2024/12/25/ovs-docker-vlan/">使用ovs+docker实现容器间vlan隔离</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+        
+      </div>
+      <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      
+      &copy; 2025 Skippor<br>
+      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+</nav>
+    
+
+
+<script src="/js/jquery-3.4.1.min.js"></script>
+
+
+
+  
+<script src="/fancybox/jquery.fancybox.min.js"></script>
+
+
+
+
+<script src="/js/script.js"></script>
+
+
+
+
+
+  </div>
+</body>
+</html>
